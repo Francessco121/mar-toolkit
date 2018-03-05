@@ -92,3 +92,18 @@ false || true // == true
 // Pointer de-reference
 *pointerVariable
 ```
+
+## Type Cast
+```rust
+// Type cast with the 'as' keyword
+
+0x0100 as ptr<word> // == pointer to memory location 0x0100
+
+true as word // == 1
+
+0 as bool // == false
+
+230 /* assume is byte */ as word // == 230
+
+0xC789 as byte // == 0x0089 (higher bits are truncated)
+```

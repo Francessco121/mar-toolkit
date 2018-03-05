@@ -1,21 +1,21 @@
 # HLML Comments
 
 ## Single-line
-```rust
+```c
 // Hello world!
 ```
 
 ## Multi-line
-```rust
+```c
 /* Hello
 World
 ! */
 ```
 
 ## Documentation
-```rust
+```c
 /// A function that does nothing... :(
-fn void pointless() { }
+void pointless() { }
 
 /// Valid on variables too!
 const word a = 4;

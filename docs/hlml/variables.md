@@ -3,7 +3,7 @@
 ## Top-level
 ```rust
 // Mutable top-level variable
-var word a = 3;
+word a = 3;
 
 // Immutable top-level variable
 final word b = 5;
@@ -19,7 +19,7 @@ entry {
 ```rust
 entry {
     // Mutable variable
-    var word a = 3;
+    word a = 3;
     a = 5;
 
     // Immutable variable

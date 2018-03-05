@@ -30,7 +30,7 @@ if true {
 
 #### If, else if, and else
 ```rust
-var word i = ...;
+word i = ...;
 
 if i > 5 {
     // i is greater than 5
@@ -96,27 +96,27 @@ do {
 **Note:** Each of the 3 parts of a `for` statement are optional.
 
 ```rust
-for var word i = 0; i < 10; i = i + 1 {
+for word i = 0; i < 10; i = i + 1 {
     // loops 10 times
 }
 ```
 
 ```rust
-var word i = 0;
+word i = 0;
 for i = 3; i < 5; i = i + 1 {
     // loops 2 times
 }
 ```
 
 ```rust
-var word i = 0;
+word i = 0;
 for ; i < 5; i = i + 1 {
     // loops 5 times
 }
 ```
 
 ```rust
-var word i = 0;
+word i = 0;
 for ; i < 5; {
     // loops 5 times
     i = i + 1;
@@ -138,14 +138,14 @@ for ;; {
 Immediately exits a loop. The `break` statement can be used in any loop structure.
 
 ```rust
-var i = 0;
+word i = 0;
 loop {
     if i == 5 {
         // Exit the loop once i is 5
         break;
     }
 
-    i++;
+    i = i + 1;
 }
 ```
 
@@ -157,7 +157,7 @@ loop {
 Skips the remainder of an iteration. The `continue` statement can be used in any loop structure.
 
 ```rust
-var i = 0;
+word i = 0;
 while i < 10 {
     if i % 2 == 0 {
         // Skip even numbers
