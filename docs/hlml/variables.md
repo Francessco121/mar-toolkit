@@ -37,6 +37,33 @@ entry {
 }
 ```
 
+## Uninitialized Variables
+
+### In Scopes
+Variables **inside of a function** that are neither `const` nor `final` do not require an initializer. This means that the variable is declared and has a memory address, but its value is undefined.
+
+```dart
+entry {
+    // Allocate space on the stack for 'local'
+    word local;
+
+    word a = local; // 'a' here could be anything!
+
+    local = 30; // 'local' is now initialized
+
+    word b = local; // b == 30
+}
+```
+
+### Top-level
+Top-level variables always require an initializer. Reading from a top-level variable is guaranteed to be safe (in the sense that the value is not undefined).
+
+```dart
+word a; // Compile-time error!
+
+entry { }
+```
+
 ## Modifiers
 
 ### `const`

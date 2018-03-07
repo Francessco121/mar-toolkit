@@ -27,7 +27,7 @@ enum SomeEnum {
 }
 ```
 
-## Usage
+## Example Usage
 ```rust
 enum Foo {
     A,
@@ -41,5 +41,36 @@ entry {
     if d == Foo.A {
         d = Foo.C;
     }
+}
+```
+
+## Type Casting enum <-> word
+All enum values are backed by a `word` in HLML. Therefore, an enum variable can be casted to a word, and vise versa:
+
+```rust
+enum Foo {
+    A,
+    B = 0x0200
+}
+
+entry {
+    word value = 0;
+    Foo foo = value as Foo; // foo == Foo.A
+
+    Foo bar = Foo.B;
+    word value2 = bar as word; // value2 == 0x0200
+}
+```
+
+Casting a word to an enum that does not have a named value for that number is allowed:
+
+```rust
+enum Foo {
+    A = 0
+}
+
+entry {
+    word value = 40;
+    Foo value2 = value as Foo; // value2 == 40, but as type Foo!
 }
 ```

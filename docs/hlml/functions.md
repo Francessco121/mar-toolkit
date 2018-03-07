@@ -59,3 +59,44 @@ entry {
     word c = add(a, 6 + 2); // c == 13
 }
 ```
+
+## "Pass-By Value"
+In HLML, **all** variables as passed by value to functions (i.e. the value is copied into the parameter). 
+
+```dart
+void func(word a) {
+    // a equals 40 here
+    
+    a = 20;
+
+    // a now equals 20
+}
+
+entry {
+    word variable = 40;
+
+    func(variable);
+
+    // variable still equals 40 here!
+}
+```
+
+**This includes arrays:**
+```dart
+void func(word[3] array) {
+    // 'array' is a copy of the value passed!
+
+    array[1] = 780;
+}
+
+entry {
+    word[3] values = [1, 2, 3];
+
+    func(values);
+
+    // values[1] equals 2 still!
+}
+```
+
+## "Pass-By Reference"
+Passing a *reference* to a value requires pointers, [which is explained here](pointers.md#using-pointers-to-pass-by-reference).

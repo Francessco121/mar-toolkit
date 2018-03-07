@@ -12,5 +12,6 @@
 - [Scoping](./scoping.md)
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
+- [Arrays](./arrays.md)
 - [Tick Management](./tick_management.md)
 - [Inline Assembly](./inline_assembly.md)
