@@ -1,29 +1,80 @@
 # HLML Variable Syntax
 
 ## Top-level
-```rust
-// Mutable top-level variable
+```dart
+/// Mutable top-level variable
 word a = 3;
 
-// Immutable top-level variable
+/// Immutable top-level variable
 final word b = 5;
+
+/// Constant top-level variable
+const word C = 10;
 
 entry {
     a = 5; // Valid
 
-    // b = 2; // Compile-time error!
+    b = 2; // Compile-time error!
+
+    C = 15; // Compile-time error!
 }
 ```
 
-## In Functions
-```rust
+## In Scopes
+```dart
 entry {
-    // Mutable variable
+    // Scoped mutable variable
     word a = 3;
     a = 5;
 
-    // Immutable variable
+    // Scoped immutable variable
     final word b = 5;
-    // b = 2; // Compile-time error!
+    b = 2; // Compile-time error!
+
+    // Constant immutable variable
+    const word C = 10;
+    C = 20; // Compile-time error!
 }
+```
+
+## Modifiers
+
+### `const`
+Specifies that the variable's value is known at compile-time and is readonly after initialization. Note: `const` is *not* part of the type in HLML.
+
+#### Examples
+```dart
+const word A = 40;
+
+A = 20; // Compile-time error! Cannot change a constant at run-time.
+```
+
+```dart
+int getInteger() { ... }
+
+const word B = getInteger(); // Compile-time error! Value not known at compile-time.
+```
+
+```dart
+const word C; // Compile-time error! Constants must have a value upon initialization.
+```
+
+### `final`
+Specifies that the variable's value is known at declaration time and is readonly after initialization. Note: `final` is *not* part of the type.
+
+#### Examples
+```dart
+final word a = 30;
+
+a = 10; // Compile-time error! Cannot change a final after initialization.
+```
+
+```dart
+int getInteger() { ... }
+
+final word b = getInteger(); // OK!
+```
+
+```dart
+final word c; // Compile-time error! Final variables must have a value upon initialization.
 ```

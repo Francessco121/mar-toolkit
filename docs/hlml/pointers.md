@@ -4,19 +4,13 @@
 ```c
 // Casting a word to a pointer yields a pointer to that offset in memory
 //
-// Note: 'const' here applies to the pointer itself, not the value being pointed to.
-//       '*pointer = 10' would still work, but
-//       'pointer = 0x0200' would not.
+// Note: 'const' here only applies to the pointer. The value
+//       pointed to can still be changed.
 const ptr<word> pointer = 0x0100 as ptr<word>;
-
-// To create a constant read-only pointer, mark the inner type as 'final'.
-//
-// Note: The type-cast does not require 'final', that will be inferred.
-const ptr<final word> readonlyPointer = 0x0100 as ptr<word>;
 ```
 
 ## Using Pointers to "Pass-By Reference"
-```c
+```dart
 /// Increments the given [valuePtr]'s value.
 void increment(ptr<word> valuePtr) {
     *valuePtr = *valuePtr + 1;
