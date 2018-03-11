@@ -15,6 +15,7 @@
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
 - [Structures](./structs.md)
+- [Strings](./strings.md)
 - [Tick Management](./tick_management.md)
 
 ### Advanced Topics
