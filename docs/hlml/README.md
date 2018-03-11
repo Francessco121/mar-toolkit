@@ -3,6 +3,8 @@
 **Note:** This is a work in progress.
 
 ## Contents
+
+### Basics
 - [Comments](./comments.md)
 - [Types](./types.md)
 - [Operators](./operators.md)
@@ -13,6 +15,9 @@
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
 - [Structures](./structs.md)
-- [Stack Allocation](./stack_allocation.md)
 - [Tick Management](./tick_management.md)
+
+### Advanced Topics
+- [Modularity](./modularity.md)
+- [Stack Allocation](./stack_allocation.md)
 - [Inline Assembly](./inline_assembly.md)
