@@ -12,6 +12,7 @@
 - [Scoping](./scoping.md)
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
+- [Structures](./structs.md)
 - [Stack Allocation](./stack_allocation.md)
 - [Tick Management](./tick_management.md)
 - [Inline Assembly](./inline_assembly.md)
