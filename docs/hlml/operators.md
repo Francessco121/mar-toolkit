@@ -91,6 +91,9 @@ false || true // == true
 
 // Pointer de-reference
 *pointerVariable
+
+// Structure arrow de-reference
+structType->fieldName
 ```
 
 ## Type Cast
