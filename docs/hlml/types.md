@@ -13,3 +13,4 @@
 ### Special
 - `void` - Specifies that a function returns nothing. Only allowed to appear as a function return type.
 - `ptr<T>` - Represents a pointer to the given type `T` (e.g. `ptr<word>`).
+- `str` - A constant readonly reference to a set of characters.
