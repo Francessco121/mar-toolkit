@@ -1,23 +1,28 @@
 # HLML Pointers
 
 ## Pointers to Arbitrary Memory
-```c
-// Casting a word to a pointer yields a pointer to that offset in memory
+```rust
+// The built-in function @intToPtr can be used to convert an integer
+// to a pointer to that location in memory.
 //
-// Note: 'const' here only applies to the pointer. The value
+// Note: 'const' here only applies to the variable. The value
 //       pointed to can still be changed.
-const ptr<word> pointer = 0x0100 as ptr<word>;
+const pointer: &u16 = @intToPtr(0x0100);
+
+// To specify a pointer to a value that shouldn't be changed,
+// use a 'const' type:
+const readonlyPointer: &const u16 = @intToPtr(0x0100);
 ```
 
 ## Using Pointers to "Pass-By Reference"
-```dart
+```rust
 /// Increments the given [valuePtr]'s value.
-void increment(ptr<word> valuePtr) {
+fn increment(valuePtr: &u16) void {
     *valuePtr = *valuePtr + 1;
 }
 
 entry {
-    word a = 0;
+    var a = 0;
 
     // Passing the address of 'a' lets 'increment' modify it
     increment(&a);

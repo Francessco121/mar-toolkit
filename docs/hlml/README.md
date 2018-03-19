@@ -15,10 +15,12 @@
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
 - [Structures](./structs.md)
-- [Strings](./strings.md)
 - [Tick Management](./tick_management.md)
 
 ### Advanced Topics
 - [Modularity](./modularity.md)
-- [Stack Allocation](./stack_allocation.md)
 - [Inline Assembly](./inline_assembly.md)
+
+### To Do
+- Arrays
+- Strings

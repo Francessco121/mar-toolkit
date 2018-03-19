@@ -17,7 +17,7 @@ entry {
 Variables and enum values can be 'interpolated' into inline assembly blocks. For example:
 
 ```
-word a = 5;
+var a = 5;
 
 asm #
     mov A, ${a} ; Moves 5 into register A
@@ -42,7 +42,7 @@ entry {
 
 Interpolated identifiers can also be destination operands:
 ```
-word a;
+var a: u16 = undefined;
 
 asm #
     mov A, 5

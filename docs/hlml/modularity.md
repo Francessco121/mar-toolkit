@@ -7,15 +7,15 @@ HLML supports importing other HLML files through the use of the `import` keyword
 ```dart
 import "bar.hlml";
 
-void function() {
-    word number = getInteger();
+fn function() void {
+    var number = getInteger();
 }
 ```
 
 **bar.hlml:**
-```dart
+```rust
 // The 'pub' keyword exposes a top-level declaration to other files
-pub word getInteger() {
+pub fn getInteger() u16 {
     return 0x0123;
 }
 ```
@@ -31,7 +31,7 @@ HLML files can "export" other HLML files with the use of the `export` keyword. T
 
 ### Example
 **a.hlml**
-```dart
+```rust
 pub const SOME_CONSTANT = 24;
 ````
 
@@ -44,8 +44,8 @@ export "a.hlml";
 ```dart
 import "b.hlml";
 
-void function() {
-    word value = SOME_CONSTANT; // Works!
+fn function() void {
+    var value = SOME_CONSTANT; // value == 24
 }
 ```
 

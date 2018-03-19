@@ -3,13 +3,13 @@
 ## Top-level
 ```dart
 /// Mutable top-level variable
-word a = 3;
+var a = 3;
 
 /// Immutable top-level variable
-final word b = 5;
+final b = 5;
 
 /// Constant top-level variable
-const word C = 10;
+const C = 10;
 
 entry {
     a = 5; // Valid
@@ -24,44 +24,51 @@ entry {
 ```dart
 entry {
     // Scoped mutable variable
-    word a = 3;
+    var a = 3;
     a = 5;
 
     // Scoped immutable variable
-    final word b = 5;
+    final b = 5;
     b = 2; // Compile-time error!
 
     // Constant immutable variable
-    const word C = 10;
+    const C = 10;
     C = 20; // Compile-time error!
 }
 ```
 
-## Uninitialized Variables
+## Type Annotations
+In most cases, type annotations are optional in HLML.
 
-### In Scopes
-Variables **inside of a function** that are neither `const` nor `final` do not require an initializer. This means that the variable is declared and has a memory address, but its value is undefined.
+```dart
+// Creates a variable named 'a' of type 'u8'
+var a: u8 = 30;
+
+// Note: Variable types inferred from integer literals
+//       default to 'u16'.
+//
+// Creates a variable named 'b' of type 'u16'
+var b = 30;
+```
+
+## Undefined Variables
+
+All variables in HLML are required to be initialized. To explicitly state that a variable should not be initialized to *a value*, assign it to `undefined`.
 
 ```dart
 entry {
     // Allocate space on the stack for 'local'
-    word local;
+    //
+    // Note: The type annotation is required for variables
+    //       initialized to 'undefined'
+    var local: u16 = undefined;
 
-    word a = local; // 'a' here could be anything!
+    var a = local; // 'a' here could be anything!
 
-    local = 30; // 'local' is now initialized
+    local = 30; // 'local' is now initialized to a value
 
-    word b = local; // b == 30
+    var b = local; // b == 30
 }
-```
-
-### Top-level
-Top-level variables always require an initializer. Reading from a top-level variable is guaranteed to be safe (in the sense that the value is not undefined).
-
-```dart
-word a; // Compile-time error!
-
-entry { }
 ```
 
 ## Modifiers
@@ -71,19 +78,19 @@ Specifies that the variable's value is known at compile-time and is readonly aft
 
 #### Examples
 ```dart
-const word A = 40;
+const A = 40;
 
-A = 20; // Compile-time error! Cannot change a constant at run-time.
+A = 20; // Compile-time error! Cannot change a constant.
 ```
 
 ```dart
-int getInteger() { ... }
+u16 getInteger() { ... }
 
-const word B = getInteger(); // Compile-time error! Value not known at compile-time.
+const B = getInteger(); // Compile-time error! Value not known at compile-time.
 ```
 
 ```dart
-const word C; // Compile-time error! Constants must have a value upon initialization.
+const C: u16 = undefined; // Compile-time error! Constants must have a value upon initialization.
 ```
 
 ### `final`
@@ -91,17 +98,17 @@ Specifies that the variable's value is known at declaration time and is readonly
 
 #### Examples
 ```dart
-final word a = 30;
+final a = 30;
 
 a = 10; // Compile-time error! Cannot change a final after initialization.
 ```
 
 ```dart
-int getInteger() { ... }
+u16 getInteger() { ... }
 
-final word b = getInteger(); // OK!
+final b = getInteger(); // OK!
 ```
 
 ```dart
-final word c; // Compile-time error! Final variables must have a value upon initialization.
+final c: u16 = undefined; // Compile-time error! Final variables must have a value upon initialization.
 ```

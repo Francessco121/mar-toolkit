@@ -29,8 +29,8 @@ if true {
 ```
 
 #### If, else if, and else
-```rust
-word i = ...;
+```dart
+var i = ...;
 
 if i > 5 {
     // i is greater than 5
@@ -50,7 +50,7 @@ if i > 5 {
 ```
 
 ```rust
-// Loops until a break statement
+// Loops until a break or return statement
 loop {
     // ...
 }
@@ -75,7 +75,7 @@ while condition {
 'do' '{' do_while_block '}' 'while' expression ';'
 ```
 
-```rust
+```dart
 // Loops while condition is true
 //
 // Note: condition is evaluated *after* an iteration,
@@ -88,35 +88,35 @@ do {
 
 ### For loop
 ```c
-'for' ( var_declaration | expression_stmt | ';') expression? ';' expression? '{'
+'for' ( var_declaration | expression_stmt | ';' ) expression? ';' expression? '{'
     for_block
 '}'
 ```
 
 **Note:** Each of the 3 parts of a `for` statement are optional.
 
-```rust
-for word i = 0; i < 10; i = i + 1 {
+```dart
+for var i = 0; i < 10; i += 1 {
     // loops 10 times
 }
 ```
 
-```rust
-word i = 0;
-for i = 3; i < 5; i = i + 1 {
+```dart
+var i = 0;
+for i = 3; i < 5; i += 1 {
     // loops 2 times
 }
 ```
 
-```rust
-word i = 0;
-for ; i < 5; i = i + 1 {
+```dart
+var i = 0;
+for ; i < 5; i += 1 {
     // loops 5 times
 }
 ```
 
-```rust
-word i = 0;
+```dart
+var i = 0;
 for ; i < 5; {
     // loops 5 times
     i = i + 1;
@@ -138,14 +138,14 @@ for ;; {
 Immediately exits a loop. The `break` statement can be used in any loop structure.
 
 ```rust
-word i = 0;
+var i = 0;
 loop {
     if i == 5 {
         // Exit the loop once i is 5
         break;
     }
 
-    i = i + 1;
+    i += 1;
 }
 ```
 
@@ -156,8 +156,8 @@ loop {
 
 Skips the remainder of an iteration. The `continue` statement can be used in any loop structure.
 
-```rust
-word i = 0;
+```dart
+var i = 0;
 while i < 10 {
     if i % 2 == 0 {
         // Skip even numbers

@@ -28,7 +28,7 @@ enum SomeEnum {
 ```
 
 ## Example Usage
-```rust
+```dart
 enum Foo {
     A,
     B,
@@ -36,7 +36,7 @@ enum Foo {
 }
 
 entry {
-    Foo d = Foo.A;
+    var d = Foo.A;
 
     if d == Foo.A {
         d = Foo.C;
@@ -44,33 +44,33 @@ entry {
 }
 ```
 
-## Type Casting enum <-> word
-All enum values are backed by a `word` in HLML. Therefore, an enum variable can be casted to a word, and vise versa:
+## Type Casting enum <-> u16
+All enum values are backed by a `u16` in HLML. Therefore, an enum variable can be casted to a `u16`, and vise versa:
 
-```rust
+```dart
 enum Foo {
     A,
     B = 0x0200
 }
 
 entry {
-    word value = 0;
-    Foo foo = value as Foo; // foo == Foo.A
+    var value = 0;
+    var foo = value as Foo; // foo == Foo.A
 
-    Foo bar = Foo.B;
-    word value2 = bar as word; // value2 == 0x0200
+    var bar = Foo.B;
+    var value2 = bar as u16; // value2 == 0x0200
 }
 ```
 
-Casting a word to an enum that does not have a named value for that number is allowed:
+Casting a `u16` to an enum that does not have a named value for that number is allowed:
 
-```rust
+```dart
 enum Foo {
     A = 0
 }
 
 entry {
-    word value = 40;
-    Foo value2 = value as Foo; // value2 == 40, but as type Foo!
+    var value = 40;
+    var value2 = value as Foo; // value2 == 40, but as type Foo!
 }
 ```

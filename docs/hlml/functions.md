@@ -3,31 +3,28 @@
 ## Definition
 ```c
 function_stmt:
-type IDENTIFIER '(' parameter ( ',' parameter )* ')' '{' 
+'fn' IDENTIFIER '(' parameter ( ',' parameter )* ')' return_type '{' 
     function_body 
 '}'
-
-parameter:
-type IDENTIFIER
 ```
 
-```c
+```rust
 /// Parameter-less function which returns no value
-void function() {
+fn function() void {
     // ...
 }
 ```
 
-```c
-/// Function which takes 2 16-bit integers and returns their sum
-word add(word a, word b) {
+```rust
+/// Function which takes 2 unsigned 16-bit integers and returns their sum
+fn add(a: u16, b: u16) u16 {
     return a + b;
 }
 ```
 
-```c
+```rust
 /// Void function with a return
-void function(word a) {
+fn function(a: u16) void {
     if a < 5 { return; }
 
     // ...
@@ -47,24 +44,24 @@ entry {
 
 ## Calling Functions
 
-```c
-word add(word a, word b) {
+```rust
+fn add(a: u16, b: u16) u16 {
     return a + b;
 }
 
 entry {
-    word a = 5;
+    var a = 5;
 
     // Each argument can be any expression
-    word c = add(a, 6 + 2); // c == 13
+    var c = add(a, 6 + 2); // c == 13
 }
 ```
 
 ## "Pass-By Value"
-In HLML, **all** variables as passed by value to functions (i.e. the value is copied into the parameter). 
+In HLML, variables as passed by value to functions (i.e. the value is copied into the parameter). 
 
-```dart
-void func(word a) {
+```rust
+fn func(a: u16) void {
     // a equals 40 here
     
     a = 20;
@@ -73,7 +70,7 @@ void func(word a) {
 }
 
 entry {
-    word variable = 40;
+    var variable = 40;
 
     func(variable);
 
@@ -81,21 +78,10 @@ entry {
 }
 ```
 
-**This includes arrays:**
-```dart
-void func(word[3] array) {
-    // 'array' is a copy of the value passed!
-
-    array[1] = 780;
-}
-
-entry {
-    word[3] values = [1, 2, 3];
-
-    func(values);
-
-    // values[1] equals 2 still!
-}
+An exception to this rule is arrays and structs, neither of which are allowed to be passed by value:
+```rust
+// Compile-time error!
+fn func(array: [3]u16) void { }
 ```
 
 ## "Pass-By Reference"

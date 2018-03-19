@@ -13,10 +13,10 @@ World
 ```
 
 ## Documentation
-```c
+```rust
 /// A function that does nothing... :(
-void pointless() { }
+fn pointless() void { }
 
 /// Valid on variables too!
-const word a = 4;
+const a = 4;
 ```

@@ -91,22 +91,45 @@ false || true // == true
 
 // Pointer de-reference
 *pointerVariable
-
-// Structure arrow de-reference
-structType->fieldName
 ```
 
-## Type Cast
+## Special
 ```rust
-// Type cast with the 'as' keyword
+// Dot access
+structure.field
+```
 
-0x0100 as ptr<word> // == pointer to memory location 0x0100
+## Shorthand
+Most operators in HLML have short-hand versions for assignment.
 
-true as word // == 1
+```rust
+// a = a + 3
+a += 3
 
-0 as bool // == false
+// a = a - 2
+a -= 2
 
-230 /* assume is byte */ as word // == 230
+// a = a * 5
+a *= 5
 
-0xC789 as byte // == 0x0089 (higher bits are truncated)
+// a = a / 3
+a /= 3
+
+// a = a % 10
+a %= 10
+
+// a = a & 0x0010
+a &= 0x0010
+
+// a = a | 0x1000
+a |= 0x1000
+
+// a = a ^ 0x1010
+a ^= 0x1010
+
+// a = a << 3
+a <<= 3
+
+// a = a >> 2
+a >>= 2
 ```
