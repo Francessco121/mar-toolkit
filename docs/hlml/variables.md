@@ -84,7 +84,7 @@ A = 20; // Compile-time error! Cannot change a constant.
 ```
 
 ```dart
-u16 getInteger() { ... }
+fn getInteger() u16 { ... }
 
 const B = getInteger(); // Compile-time error! Value not known at compile-time.
 ```
@@ -104,7 +104,7 @@ a = 10; // Compile-time error! Cannot change a final after initialization.
 ```
 
 ```dart
-u16 getInteger() { ... }
+fn getInteger() u16 { ... }
 
 final b = getInteger(); // OK!
 ```
