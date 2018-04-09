@@ -22,7 +22,7 @@ x* - Zero or more occurrences of x.
 ```
 
 ## Grammar
-```javascript
+```dart
 program             = line* ;
 line                = ( constant | section | labelable )? comment? NEWLINE ;
 
