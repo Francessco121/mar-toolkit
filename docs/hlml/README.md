@@ -10,16 +10,16 @@
 - [Operators](./operators.md)
 - [Variables](./variables.md)
 - [Functions](./functions.md)
-- [Control Flow](./control_flow.md)
+- [Control Flow](./control-flow.md)
 - [Scoping](./scoping.md)
 - [Pointers](./pointers.md)
 - [Enums](./enums.md)
 - [Structures](./structs.md)
-- [Tick Management](./tick_management.md)
+- [Tick Management](./tick-management.md)
 
 ### Advanced Topics
 - [Modularity](./modularity.md)
-- [Inline Assembly](./inline_assembly.md)
+- [Inline Assembly](./inline-assembly.md)
 
 ### To Do
 - Arrays

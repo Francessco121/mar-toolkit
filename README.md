@@ -9,5 +9,5 @@ The HLML toolkit is a set of programs meant for building bots for the game [Much
 - Custom MAR assembler with macro support
 - MAR disassembler
 
-## Documentation
-Currently, documentation exists in the repository under [the /docs folder](./docs). This will most likely be moved to the GitHub wiki at some point.
+## Contents
+- [docs](./docs) - Contains the language reference for HLML, the macro MAR assembly language, and documentation of the toolkit.
