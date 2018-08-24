@@ -23,12 +23,13 @@ x* - Zero or more occurrences of x.
 
 ## Grammar
 ```dart
-program             = line* ;
-line                = ( constant | section | labelable )? comment? NEWLINE ;
+program             = ( line ( NEWLINE line? )* )? ;
+line                = ( ( constant | section | labelable | label ) comment? ) | comment ;
 
 constant            = IDENTIFIER EQU const_expression ;
 section             = '.' IDENTIFIER ;
-labelable           = ( IDENTIFIER ':' )? ( instruction | directive ) ;
+labelable           = label? ( instruction | directive ) ;
+label               = IDENTIFIER ':' ;
 
 directive           = org_directive | dw_directive ;
 
@@ -40,11 +41,10 @@ dw_integer_operand  = const_expression ( DUP '(' const_expression ')' )? ;
 dw_string_operand   = STRING ;
 
 instruction         = IDENTIFIER ( inst_operand ( ',' inst_operand )? )? ;
-inst_operand        = immediate | register | memory ;
+inst_operand        = immediate | memory | IDENTIFIER ;
 immediate           = integer ;
-register            = IDENTIFIER ;
 memory              = '[' memory_value ( ( '-' | '+' ) memory_value )? ']' ;
-memory_value        = integer | register | IDENTIFIER ;
+memory_value        = integer | IDENTIFIER ;
 
 const_expression    = const_value ( ( '-' | '+' ) const_value )* ;
 const_value         = integer | IDENTIFIER ;
@@ -67,5 +67,5 @@ INTEGER_BASE10  = /[0-9]+/ ;
 INTEGER_BASE16  = /0x[0-9a-fA-F]+/ ;
 NEWLINE         = /\r?\n/;
 ORG             = /org/i ;
-STRING          = /"(?:.|\\a|\\b|\\f|\\n|\\r|\\t|\\v|\\\\|\\")*"/ ;
+STRING          = /"(?:.|\\b|\\n|\\r|\\t|\\0|\\\\|\\")*"/ ;
 ```
