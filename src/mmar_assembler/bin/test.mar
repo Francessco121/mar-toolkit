@@ -1,0 +1,11 @@
+ORG 0x1000
+
+CONSTANT equ 56 + 5 - 1
+
+DW 0x4000
+
+.text
+  label2:
+    label: mov A, 3 ; comment
+    jmp label2
+  brk

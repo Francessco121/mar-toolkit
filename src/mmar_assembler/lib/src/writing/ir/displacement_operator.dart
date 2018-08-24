@@ -1,0 +1,4 @@
+enum DisplacementOperator {
+  plus,
+  minus
+}

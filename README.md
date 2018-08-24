@@ -11,3 +11,4 @@ The HLML toolkit is a set of programs meant for building bots for the game [Much
 
 ## Contents
 - [docs](./docs) - Contains the language reference for HLML, the macro MAR assembly language, and documentation of the toolkit.
+- [src](./src) - The source code of the toolkit.
