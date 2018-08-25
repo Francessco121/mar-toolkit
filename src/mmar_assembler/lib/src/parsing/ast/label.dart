@@ -1,11 +1,9 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'node.dart';
-import 'node_visitor.dart';
 
 @immutable
-class Label implements Node {
+class Label {
   final Token identifier;
   final Token colonToken;
 
@@ -15,9 +13,4 @@ class Label implements Node {
   })
     : assert(identifier != null),
       assert(colonToken != null);
-
-  @override
-  void accept(NodeVisitor visitor) {
-    visitor.visitLabel(this);
-  }
 }

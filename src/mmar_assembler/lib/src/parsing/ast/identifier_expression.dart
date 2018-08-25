@@ -1,11 +1,11 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'expression.dart';
-import 'expression_visitor.dart';
+import 'const_expression.dart';
+import 'const_expression_visitor.dart';
 
 @immutable
-class IdentifierExpression implements Expression {
+class IdentifierExpression implements ConstExpression {
   final Token identifier;
 
   const IdentifierExpression({
@@ -14,7 +14,7 @@ class IdentifierExpression implements Expression {
     : assert(identifier != null);
 
   @override
-  T accept<T>(ExpressionVisitor<T> visitor) {
+  int accept(ConstExpressionVisitor visitor) {
     return visitor.visitIdentifierExpression(this);
   }
 }

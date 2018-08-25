@@ -1,29 +1,23 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'dw_operand.dart';
 import 'label.dart';
 import 'line.dart';
 import 'line_visitor.dart';
 
 @immutable
-class DwDirective implements Line {
+class LabelLine implements Line {
   final Token comment;
   final Label label;
-  final Token dwToken;
-  final List<DwOperand> operands;
 
-  const DwDirective({
+  const LabelLine({
     @required this.label,
-    @required this.dwToken,
-    @required this.operands,
     @required this.comment
   })
-    : assert(dwToken != null),
-      assert(operands != null);
+    : assert(label != null);
 
   @override
   void accept(LineVisitor visitor) {
-    visitor.visitDwDirective(this);
+    visitor.visitLabelLine(this);
   }
 }

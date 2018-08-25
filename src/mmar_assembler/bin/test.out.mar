@@ -1,0 +1,6 @@
+ORG 0x1000
+CONSTANT EQU 0x3c
+dw_label: DW 0x200, 0x4000 DUP(0x5), "string" ; dw comment
+; test
+.text
+label2:

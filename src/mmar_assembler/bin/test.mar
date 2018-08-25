@@ -2,8 +2,9 @@ ORG 0x1000
 
 CONSTANT equ 56 + 5 - 1
 
-DW 0x4000
+dw_label: DW 0x0200, 0x4000 DUP(5), "string" ; dw comment
 
+; test
 .text
   label2:
     label: mov A, 3 ; comment

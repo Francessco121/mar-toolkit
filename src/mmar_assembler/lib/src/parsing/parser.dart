@@ -31,10 +31,7 @@ class Parser {
         }
 
         // Parse newline or EOF
-        final Token token = _advance();
-        if (token.type != TokenType.newline && token.type != TokenType.eof) {
-          throw _error(token, 'Expected newline or end of file.');
-        }
+        _consumeAny(const [TokenType.newline, TokenType.eof], 'Expected newline or end of file.');
       } on _ParseException {
         // Skip until newline or EOF
         while (true) {
@@ -55,80 +52,67 @@ class Parser {
   }
 
   ast.Line _line() {
-    // Parse the inner node if it exists
-    ast.Node innerNode;
     if (_check(TokenType.dot)) {
       // Section
-      innerNode = _section(_advance());
-    } else if (_check(TokenType.identifier)) {
-      final Token identifier = _advance();
-
-      if (_check(TokenType.equ)) {
-        // Parse constant
-        innerNode = _constant(identifier, _advance());
-      } else {
-        // Parse labelable
-        innerNode = _labelable(identifier);
-      }
-    } else {
-      // Directive
-      innerNode = _directive();
-    }
-
-    // Parse the comment if it exists
-    Token comment;
-    if (_check(TokenType.comment)) {
-      comment = _advance();
-    }
-
-    // Only return a node if an inner node or comment exists
-    if (innerNode != null || comment != null) {
-      return ast.Line(
-        innerNode: innerNode,
-        comment: comment
-      );
-    } else {
-      return null;
-    }
-  }
-
-  ast.Node _labelable(Token identifier) {
-    // Parse the label if it exists
-    ast.Label label;
-    if (_check(TokenType.colon)) {
-      label = _label(identifier, _advance());
-    }
-
-    if (_checkAny(const [TokenType.comment, TokenType.newline])) {
-      // The line just contains a label (optionally with a comment)
-      return label;
-    } else {
-      if (_check(TokenType.dw)) {
-        // DW directives can be labeled
-        return _dwDirective(label, _advance());
-      } else {
-        if (label != null) {
-          // The identifier variable was used by the label, so we must consume
-          // the instruction's mnemonic as the new identifier value
-          identifier = _consume(TokenType.identifier, 'Expected instruction mnemonic.');
-        }
-
-        // Parse the instruction
-        return _instruction(label, identifier);
-      }
-    }
-  }
-
-  ast.Node _directive() {
-    if (_check(TokenType.org)) {
+      return _section(_advance());
+    } else if (_check(TokenType.org)) {
       // ORG directive
       return _orgDirective(_advance());
     } else if (_check(TokenType.dw)) {
       // Unlabeled DW directive
       return _dwDirective(null, _advance());
+    } else if (_check(TokenType.identifier)) {
+      // Constant or labelable
+      final Token identifier = _advance();
+
+      if (_check(TokenType.equ)) {
+        // Parse constant
+        return _constant(identifier, _advance());
+      } else {
+        // Parse labelable
+        return _labelable(identifier);
+      }
+    } else if (_check(TokenType.comment)) {
+      // Comment line
+      return ast.Comment(comment: _comment());
+    } else {
+      return null;
+    }
+  }
+
+  ast.Line _labelable(Token identifier) {
+    // Parse the label if it exists
+    ast.Label label;
+    if (_check(TokenType.colon)) {
+      label = new ast.Label(
+        identifier: identifier,
+        colonToken: _advance()
+      );
     }
 
-    return null;
+    if (label != null && _checkAny(const [TokenType.comment, TokenType.newline, TokenType.eof])) {
+      // Label line
+      return ast.LabelLine(
+        label: label,
+        comment: _comment()
+      );
+    } else {
+      if (_check(TokenType.dw)) {
+        // Labelable DW directive
+        return _dwDirective(label, _advance()); 
+      } else {
+        // Instruction
+
+        // Note: If we parsed a label, then the [identifier] is not the mnemonic,
+        //       instead we need to parse it next.
+        final Token mnemonic = label == null
+          ? identifier
+          : _consume(TokenType.identifier, 'Expected instruction mnemonic.');
+
+        // Parse the instruction
+        return _instruction(label, mnemonic);
+      }
+    }
   }
 
   ast.Section _section(Token dotToken) {
@@ -138,67 +122,69 @@ class Parser {
 
     return ast.Section(
       dotToken: dotToken,
-      identifier: identifier
+      identifier: identifier,
+      comment: _comment()
     );
   }
 
   ast.Constant _constant(Token identifier, Token equToken) {
-    final ast.Expression expression = _constExpression();
+    final ast.ConstExpression expression = _constExpression();
 
     return ast.Constant(
       identifier: identifier,
       equToken: equToken,
-      expression: expression
-    );
-  }
-
-  ast.Label _label(Token identifier, Token colonToken) {
-    return ast.Label(
-      identifier: identifier,
-      colonToken: colonToken
+      expression: expression,
+      comment: _comment()
     );
   }
 
   ast.OrgDirective _orgDirective(Token orgToken) {
-    final ast.Expression expression = _constExpression();
+    final ast.ConstExpression expression = _constExpression();
 
     return ast.OrgDirective(
       orgKeyword: orgToken,
-      expression: expression
+      expression: expression,
+      comment: _comment()
     );
   }
 
   ast.DwDirective _dwDirective(ast.Label label, Token dwToken) {
-    final List<ast.Expression> expressions = [];
-    expressions.add(_dwOperand());
+    final List<ast.DwOperand> operands = [];
+    operands.add(_dwOperand());
 
     while (_match(TokenType.comma)) {
-      expressions.add(_dwOperand());
+      operands.add(_dwOperand());
     }
 
     return ast.DwDirective(
       label: label,
       dwToken: dwToken,
-      expressions: expressions
+      operands: operands,
+      comment: _comment()
     );
   }
 
-  ast.Expression _dwOperand() {
+  ast.DwOperand _dwOperand() {
     if (_check(TokenType.string)) {
       // String
       final Token stringToken = _advance();
 
-      return ast.LiteralExpression(
-        token: stringToken,
-        value: stringToken.literal
+      return ast.DwOperand(
+        value: ast.StringLiteral(
+          token: stringToken,
+          value: stringToken.literal
+        ),
+        // String operands cannot use DUP
+        dupToken: null,
+        duplicate: null
       );
     } else {
       // Constant expression with possible DUP
-      final ast.Expression leftExpression = _constExpression();
+      final ast.ConstExpression leftExpression = _constExpression();
 
       // Read DUP expression if it exists
       Token dupToken;
-      ast.Expression dupExpression;
+      ast.ConstExpression dupExpression;
 
       if (_check(TokenType.dup)) {
         dupToken = _advance();
@@ -210,21 +196,21 @@ class Parser {
         _consume(TokenType.rightParen, "Expected ')' to end DUP expression.");
       }
 
-      return ast.DwIntegerExpression(
-        leftExpression: leftExpression,
+      return ast.DwOperand(
+        value: leftExpression,
         dupToken: dupToken,
-        dupExpression: dupExpression
+        duplicate: dupExpression
       );
     }
   }
 
   ast.Instruction _instruction(ast.Label label, Token mnemonic) {
     // Read first operand
-    final ast.Expression operand1 = _instructionOperand();
+    final ast.InstructionOperand operand1 = _instructionOperand();
 
     // Read second operand if a comma is found
     Token comma;
-    ast.Expression operand2;
+    ast.InstructionOperand operand2;
 
     if (operand1 != null && _check(TokenType.comma)) {
       comma = _advance();
@@ -242,34 +228,39 @@ class Parser {
       mnemonic: mnemonic,
       operand1: operand1,
       commaToken: comma,
-      operand2: operand2
+      operand2: operand2,
+      comment: _comment()
     );
   }
 
-  ast.Expression _instructionOperand() {
+  ast.InstructionOperand _instructionOperand() {
     if (_check(TokenType.integer)) {
       // Integer
       final Token integerToken = _advance();
 
-      return ast.LiteralExpression(
-        token: integerToken,
-        value: integerToken.literal
+      return ast.InstructionExpressionOperand(
+        ast.IntegerExpression(
+          token: integerToken,
+          value: integerToken.literal
+        )
       );
     } else if (_check(TokenType.identifier)) {
       // Identifier
-      return ast.IdentifierExpression(
-        identifier: _advance()
+      return ast.InstructionExpressionOperand(
+        ast.IdentifierExpression(
+          identifier: _advance()
+        )
       );
     } else if (_check(TokenType.leftBracket)) {
       // Memory
       final Token leftBracket = _advance();
 
       // Read memory value
-      final ast.Expression value = _memoryValue();
+      final ast.ConstExpression value = _memoryValue();
 
       // Read displacement if it exists
       Token displacementOperator;
-      ast.Expression displacement;
+      ast.ConstExpression displacement;
 
       if (!_check(TokenType.rightBracket)) {
         displacementOperator = _consumeAny(const [TokenType.minus, TokenType.plus],
@@ -284,7 +275,7 @@ class Parser {
         "Expected ']' to end memory expression."
       );
 
-      return ast.MemoryExpression(
+      return ast.MemoryReference(
         leftBracket: leftBracket,
         rightBracket: rightBracket,
         value: value,
@@ -296,12 +287,12 @@ class Parser {
     return null;
   }
 
-  ast.Expression _memoryValue() {
+  ast.ConstExpression _memoryValue() {
     if (_check(TokenType.integer)) {
       // Integer
       final Token integerToken = _advance();
 
-      return ast.LiteralExpression(
+      return ast.IntegerExpression(
         token: integerToken,
         value: integerToken.literal
       );
@@ -315,14 +306,14 @@ class Parser {
     throw _error(_advance(), 'Expected memory expression.');
   }
 
-  ast.Expression _constExpression() {
-    ast.Expression expression = _constValue();
+  ast.ConstExpression _constExpression() {
+    ast.ConstExpression expression = _constValue();
 
     while (_checkAny(const [TokenType.minus, TokenType.plus])) {
       final Token op = _advance();
-      final ast.Expression right = _constValue();
+      final ast.ConstExpression right = _constValue();
 
-      expression = ast.ConstExpression(
+      expression = ast.ConstBinaryExpression(
         left: expression,
         operator_: op,
         right: right
@@ -332,12 +323,12 @@ class Parser {
     return expression;
   }
 
-  ast.Expression _constValue() {
+  ast.ConstExpression _constValue() {
     if (_check(TokenType.integer)) {
       // Integer
       final Token integerToken = _advance();
 
-      return ast.LiteralExpression(
+      return ast.IntegerExpression(
         token: integerToken, 
         value: integerToken.literal
       );
@@ -349,6 +340,15 @@ class Parser {
     }
 
     throw _error(_advance(), 'Expected constant expression.');
+  }
+
+  /// Parses and returns a comment if it exists
+  Token _comment() {
+    if (_check(TokenType.comment)) {
+      return _advance();
+    } else {
+      return null;
+    }
   }
 
   _ParseException _error(Token token, String message) {
@@ -414,19 +414,11 @@ class Parser {
 
   /// Returns whether the current token is of the given [type].
   bool _check(TokenType type) {
-    if (_isAtEnd()) {
-      return false;
-    }
-
     return _peek().type == type;
   }
 
   /// Returns whether the current token is of any of the given [types].
   bool _checkAny(List<TokenType> types) {
-    if (_isAtEnd()) {
-      return false;
-    }
-
     final TokenType currentType = _peek().type;
 
     for (TokenType type in types) {

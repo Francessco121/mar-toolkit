@@ -1,24 +1,26 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'expression.dart';
-import 'node.dart';
-import 'node_visitor.dart';
+import 'const_expression.dart';
+import 'line.dart';
+import 'line_visitor.dart';
 
 @immutable
-class OrgDirective implements Node {
+class OrgDirective implements Line {
+  final Token comment;
   final Token orgKeyword;
-  final Expression expression;
+  final ConstExpression expression;
 
   const OrgDirective({
     @required this.orgKeyword,
-    @required this.expression
+    @required this.expression,
+    @required this.comment
   })
     : assert(orgKeyword != null),
       assert(expression != null);
 
   @override
-  void accept(NodeVisitor visitor) {
+  void accept(LineVisitor visitor) {
     visitor.visitOrgDirective(this);
   }
 }

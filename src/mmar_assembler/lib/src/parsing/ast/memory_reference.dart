@@ -1,20 +1,20 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'expression.dart';
-import 'expression_visitor.dart';
+import 'const_expression.dart';
+import 'instruction_operand.dart';
 
 @immutable
-class MemoryExpression implements Expression {
+class MemoryReference implements InstructionOperand {
   final Token leftBracket;
   final Token rightBracket;
   
-  final Expression value;
+  final ConstExpression value;
 
   final Token displacementOperator;
-  final Expression displacementValue;
+  final ConstExpression displacementValue;
 
-  const MemoryExpression({
+  const MemoryReference({
     @required this.leftBracket,
     @required this.rightBracket,
     @required this.value,
@@ -24,9 +24,4 @@ class MemoryExpression implements Expression {
     : assert(leftBracket != null),
       assert(rightBracket != null),
       assert(value != null);
-
-  @override
-  T accept<T>(ExpressionVisitor<T> visitor) {
-    return visitor.visitMemoryExpression(this);
-  }
 }

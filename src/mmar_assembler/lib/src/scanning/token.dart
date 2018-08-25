@@ -9,6 +9,8 @@ class Token {
   final Object literal;
   final SourceSpan sourceSpan;
 
+  String get lexeme => sourceSpan.text;
+
   Token({
     @required this.type,
     @required this.sourceSpan,
