@@ -15,6 +15,7 @@ export 'line.dart';
 export 'line_visitor.dart';
 export 'literal_expression.dart';
 export 'memory_reference.dart';
+export 'memory_value.dart';
 export 'org_directive.dart';
 export 'section.dart';
 export 'string_literal.dart';

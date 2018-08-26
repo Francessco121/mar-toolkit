@@ -256,11 +256,11 @@ class Parser {
       final Token leftBracket = _advance();
 
       // Read memory value
-      final ast.ConstExpression value = _memoryValue();
+      final ast.MemoryValue value = _memoryValue();
 
       // Read displacement if it exists
       Token displacementOperator;
-      ast.ConstExpression displacement;
+      ast.MemoryValue displacement;
 
       if (!_check(TokenType.rightBracket)) {
         displacementOperator = _consumeAny(const [TokenType.minus, TokenType.plus],
@@ -287,7 +287,7 @@ class Parser {
     return null;
   }
 
-  ast.ConstExpression _memoryValue() {
+  ast.MemoryValue _memoryValue() {
     if (_check(TokenType.integer)) {
       // Integer
       final Token integerToken = _advance();
@@ -303,7 +303,7 @@ class Parser {
       );
     }
 
-    throw _error(_advance(), 'Expected memory expression.');
+    throw _error(_advance(), 'Expected memory value.');
   }
 
   ast.ConstExpression _constExpression() {

@@ -1,18 +1,18 @@
 import 'package:meta/meta.dart';
 
 import '../../scanning/token.dart';
-import 'const_expression.dart';
 import 'instruction_operand.dart';
+import 'memory_value.dart';
 
 @immutable
 class MemoryReference implements InstructionOperand {
   final Token leftBracket;
   final Token rightBracket;
   
-  final ConstExpression value;
+  final MemoryValue value;
 
   final Token displacementOperator;
-  final ConstExpression displacementValue;
+  final MemoryValue displacementValue;
 
   const MemoryReference({
     @required this.leftBracket,

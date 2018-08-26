@@ -256,7 +256,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     return null;
   }
 
-  ir.MemoryOperand _convertMemoryOperand(ast.ConstExpression operand) {
+  ir.MemoryOperand _convertMemoryOperand(ast.MemoryValue operand) {
     if (operand is ast.IdentifierExpression) {
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
@@ -272,15 +272,17 @@ class _AstLineVisitor implements ast.LineVisitor {
           return ir.RegisterOperand(register);
         }
       }
+    } else if (operand is ast.IntegerExpression) {
+      // Integer
+      final ast.IntegerExpression integerExpression = operand;
+
+      return ir.ImmediateOperand(integerExpression.value);
     }
 
-    // Compilable expression
-    final int value = _evaluateExpression(operand);
-
-    return ir.ImmediateOperand(value);
+    throw new ArgumentError.value(operand, 'operand');
   }
 
-  ir.DisplacementOperand _convertDisplacementOperand(ast.ConstExpression operand) {
+  ir.DisplacementOperand _convertDisplacementOperand(ast.MemoryValue operand) {
     if (operand is ast.IdentifierExpression) {
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
@@ -296,12 +298,14 @@ class _AstLineVisitor implements ast.LineVisitor {
           throw new _CompileException(identifierExpression.identifier, 'Displacement operand cannot be a register.');
         }
       }
+    } else if (operand is ast.IntegerExpression) {
+      // Integer
+      final ast.IntegerExpression integerExpression = operand;
+
+      return ir.ImmediateOperand(integerExpression.value);
     }
 
-    // Compilable expression
-    final int value = _evaluateExpression(operand);
-
-    return ir.ImmediateOperand(value);
+    throw new ArgumentError.value(operand, 'operand');
   }
 
   ir.DisplacementOperator _convertDisplacementOperator(Token operatorToken) {
