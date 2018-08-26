@@ -24,3 +24,18 @@ String registerToString(Register register) {
   // Should never happen
   throw ArgumentError.value(register, 'register');
 }
+
+Register stringToRegister(String string) {
+  switch (string.toLowerCase()) {
+    case 'a': return Register.a;
+    case 'b': return Register.b;
+    case 'c': return Register.c;
+    case 'd': return Register.d;
+    case 'x': return Register.x;
+    case 'y': return Register.y;
+    case 'bp': return Register.bp;
+    case 'sp': return Register.sp;
+  }
+
+  return null;
+}

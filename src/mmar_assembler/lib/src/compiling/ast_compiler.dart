@@ -2,6 +2,7 @@ import '../scanning/token.dart';
 import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
+import '../instruction_defs.dart';
 import 'ast_compile_error.dart';
 import 'ast_compile_result.dart';
 
@@ -34,6 +35,7 @@ class AstCompiler {
 
 class _AstCompilerState {
   final Map<String, int> constants = {};
+  final Set<String> labels = new Set();
 }
 
 class _CompileException implements Exception {
@@ -112,11 +114,58 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   @override
   void visitInstruction(ast.Instruction instruction) {
-    // TODO: implement visitInstruction
+    final ir.Mnemonic mnemonic = stringToMnemonic(instruction.mnemonic.lexeme);
+
+    if (mnemonic == null) {
+      throw new _CompileException(instruction.mnemonic, 'Unknown mnemonic.');
+    }
+
+    ir.InstructionOperand operand1;
+    ir.InstructionOperand operand2;
+
+    if (instruction.operand1 != null) {
+      operand1 = _convertInstructionOperand(instruction.operand1);
+
+      if (operand1 == null) {
+        throw new _CompileException(instruction.mnemonic, 'Invalid type for operand 1.');
+      }
+
+      if (instruction.operand2 != null) {
+        operand2 = _convertInstructionOperand(instruction.operand2);
+
+        if (operand2 == null) {
+          throw new _CompileException(instruction.mnemonic, 'Invalid type for operand 2.');
+        }
+      }
+    }
+
+    _validateInstruction(mnemonic, 
+      mnemonicToken: instruction.mnemonic,
+      operand1: operand1, 
+      operand2: operand2,
+      operand1Token: instruction.mnemonic,
+      operand2Token: instruction.mnemonic
+    );
+
+    _lines.add(ir.Instruction(mnemonic,
+      operand1: operand1,
+      operand2: operand2,
+      label: instruction.label?.identifier?.lexeme,
+      comment: instruction.comment?.literal
+    ));
   }
 
   @override
   void visitLabelLine(ast.LabelLine labelLine) {
+    final String identifier = labelLine.label.identifier.lexeme;
+
+    // Don't allow users to redefine labels
+    if (_state.labels.contains(identifier)) {
+      throw new _CompileException(labelLine.label.identifier, 'Cannot redefine label.');
+    }
+
+    _state.labels.add(identifier);
+
     _lines.add(ir.Label(labelLine.label.identifier.lexeme, 
       comment: labelLine.comment?.literal
     ));
@@ -136,6 +185,173 @@ class _AstLineVisitor implements ast.LineVisitor {
     _lines.add(ir.Section(section.identifier.lexeme,
       comment: section.comment?.literal
     ));
+  }
+
+  ir.InstructionOperand _convertInstructionOperand(ast.InstructionOperand operand) {
+    if (operand is ast.InstructionExpressionOperand) {
+      final ast.InstructionExpressionOperand expressionOp = operand;
+      
+      if (expressionOp.expression is ast.IntegerExpression) {
+        // Immediate operand
+        final ast.IntegerExpression integerExpression = expressionOp.expression;
+
+        return ir.ImmediateOperand(integerExpression.value);
+      } else if (expressionOp.expression is ast.IdentifierExpression) {
+        final ast.IdentifierExpression identifierExpression = expressionOp.expression;
+        final String identifier = identifierExpression.identifier.lexeme;
+
+        // Register, label, or constant
+        final ir.Register register = ir.stringToRegister(identifier);
+
+        if (register != null) {
+          // Register
+          return ir.RegisterOperand(register);
+        } else {
+          final int constant = _state.constants[identifier];
+
+          if (constant != null) {
+            // Constant
+
+            // TODO: needs to produce a ConstantOperand
+            return ir.ImmediateOperand(constant);
+          } else {
+            if (_state.labels.contains(identifier)) {
+              // Label
+              return ir.LabelOperand(identifier);
+            }
+          }
+        }
+
+        throw new _CompileException(identifierExpression.identifier, 'Unknown identifier.');
+      }
+    } else if (operand is ast.MemoryReference) {
+      final ast.MemoryReference memoryReference = operand;
+
+      // Convert the memory operand
+      final ir.MemoryOperand memoryOperand = _convertMemoryOperand(memoryReference.value);
+
+      // Convert the displacement
+      ir.Displacement displacement;
+      if (memoryReference.displacementValue != null) {
+        // Check if a displacement can even exist
+        if (memoryOperand is! ir.RegisterOperand) {
+          throw new _CompileException(memoryReference.displacementOperator, 
+            'Memory displacements are only allowed if the left value is a register.'
+          );
+        }
+
+        final ir.DisplacementOperand operand =
+          _convertDisplacementOperand(memoryReference.displacementValue);
+
+        final ir.DisplacementOperator operator_ = 
+          _convertDisplacementOperator(memoryReference.displacementOperator);
+
+        displacement = ir.Displacement(operator_, operand);
+      }
+
+      return ir.MemoryInstructionOperand(memoryOperand, 
+        displacement: displacement
+      );
+    }
+
+    return null;
+  }
+
+  ir.MemoryOperand _convertMemoryOperand(ast.ConstExpression operand) {
+    if (operand is ast.IdentifierExpression) {
+      final ast.IdentifierExpression identifierExpression = operand;
+      final String identifier = identifierExpression.identifier.lexeme;
+
+      if (_state.labels.contains(identifier)) {
+        // Label value
+        return ir.LabelOperand(identifier);
+      } else {
+        final ir.Register register = ir.stringToRegister(identifier);
+
+        if (register != null) {
+          // Register value
+          return ir.RegisterOperand(register);
+        }
+      }
+    }
+
+    // Compilable expression
+    final int value = _evaluateExpression(operand);
+
+    return ir.ImmediateOperand(value);
+  }
+
+  ir.DisplacementOperand _convertDisplacementOperand(ast.ConstExpression operand) {
+    if (operand is ast.IdentifierExpression) {
+      final ast.IdentifierExpression identifierExpression = operand;
+      final String identifier = identifierExpression.identifier.lexeme;
+
+      if (_state.labels.contains(identifier)) {
+        // Label value
+        return ir.LabelOperand(identifier);
+      } else {
+        final ir.Register register = ir.stringToRegister(identifier);
+
+        if (register != null) {
+          // Register value
+          throw new _CompileException(identifierExpression.identifier, 'Displacement operand cannot be a register.');
+        }
+      }
+    }
+
+    // Compilable expression
+    final int value = _evaluateExpression(operand);
+
+    return ir.ImmediateOperand(value);
+  }
+
+  ir.DisplacementOperator _convertDisplacementOperator(Token operatorToken) {
+    if (operatorToken.type == TokenType.plus) {
+      return ir.DisplacementOperator.plus;
+    } else if (operatorToken.type == TokenType.minus) {
+      return ir.DisplacementOperator.minus;
+    } else {
+      throw new _CompileException(operatorToken, 
+        "Invalid displacement operator. Must be either '+' or '-'."
+      );
+    }
+  }
+
+  void _validateInstruction(ir.Mnemonic mnemonic, {
+    Token mnemonicToken,
+    ir.InstructionOperand operand1, 
+    ir.InstructionOperand operand2,
+    Token operand1Token,
+    Token operand2Token
+  }) {
+    // Get the instruction definition
+    final InstructionDefinition instructionDef = mnemonicsToInstructionDefs[mnemonic];
+
+    if (instructionDef == null) {
+      throw new ArgumentError.value(mnemonic, 'mnemonic',
+        '${mnemonic} has no corresponding instruction definition!'
+      );
+    }
+
+    // Get type flags for each operand
+    final int op1Flag = irOperandToTypeFlag(operand1);
+    final int op2Flag = irOperandToTypeFlag(operand2);
+
+    // Validate operand 1
+    if (!instructionDef.operand1.isFlagValid(op1Flag)) {
+      throw new _CompileException(operand1Token, 
+        'Operand 1 of ${mnemonicToString(mnemonic)} cannot be ${operandTypeFlagToString(op1Flag)}. '
+        'Valid types are: ${instructionDef.operand1.createHumanReadableTypeList()}.'
+      );
+    }
+
+    // Validate operand 2
+    if (!instructionDef.operand2.isFlagValid(op2Flag)) {
+      throw new _CompileException(operand2Token, 
+        'Operand 2 of ${mnemonicToString(mnemonic)} cannot be ${operandTypeFlagToString(op2Flag)}. '
+        'Valid types are: ${instructionDef.operand2.createHumanReadableTypeList()}.'
+      );
+    }
   }
 
   int _evaluateExpression(ast.ConstExpression expression) {

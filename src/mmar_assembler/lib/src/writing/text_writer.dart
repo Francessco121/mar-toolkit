@@ -1,3 +1,4 @@
+import '../instruction_defs.dart';
 import 'ir/ir.dart' as ir;
 
 class TextWriter {
@@ -73,7 +74,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
   void visitInstruction(ir.Instruction instruction) {
     _writeLabelIfExists(instruction);
 
-    _buffer.write(ir.mnemonicToString(instruction.mnemonic).toUpperCase());
+    _buffer.write(mnemonicToString(instruction.mnemonic).toUpperCase());
 
     if (instruction.operand1 != null) {
       _buffer.write(' ');

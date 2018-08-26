@@ -9,4 +9,5 @@ dw_label: DW 0x0200, 0x4000 DUP(5), "string" ; dw comment
   label2:
     label: mov A, 3 ; comment
     jmp label2
+    mov [A + 0x0010], 3
   brk
