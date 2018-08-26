@@ -122,6 +122,11 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
       final ir.LabelOperand label = operand;
 
       _buffer.write(label.labelIdentifier);
+    } else if (operand is ir.ConstOperand) {
+      // Constant reference
+      final ir.ConstOperand constant = operand;
+
+      _buffer.write(constant.constIdentifier);
     } else if (operand is ir.RegisterOperand) {
       // Register
       final ir.RegisterOperand register = operand;
@@ -161,6 +166,11 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
       final ir.LabelOperand label = operand;
 
       _buffer.write(label.labelIdentifier);
+    } else if (operand is ir.ConstOperand) {
+      // Constant reference
+      final ir.ConstOperand constant = operand;
+
+      _buffer.write(constant.constIdentifier);
     } else if (operand is ir.RegisterOperand) {
       // Register
       final ir.RegisterOperand register = operand;
@@ -183,6 +193,11 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
       final ir.LabelOperand label = operand;
 
       _buffer.write(label.labelIdentifier);
+    } else if (operand is ir.ConstOperand) {
+      // Constant reference
+      final ir.ConstOperand constant = operand;
+
+      _buffer.write(constant.constIdentifier);
     } else {
       // Should never happen
       throw ArgumentError.value(operand, 'operand');

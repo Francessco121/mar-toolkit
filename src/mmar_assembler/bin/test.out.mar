@@ -6,5 +6,5 @@ dw_label: DW 0x200, 0x4000 DUP(0x5), "string" ; dw comment
 label2:
 label: MOV A, 0x3 ; comment
 JMP label2
-MOV [A + 0x10], 0x3
+MOV [A + CONSTANT], 0x3
 BRK

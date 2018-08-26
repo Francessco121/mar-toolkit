@@ -205,20 +205,12 @@ class _AstLineVisitor implements ast.LineVisitor {
         if (register != null) {
           // Register
           return ir.RegisterOperand(register);
-        } else {
-          final int constant = _state.constants[identifier];
-
-          if (constant != null) {
-            // Constant
-
-            // TODO: needs to produce a ConstantOperand
-            return ir.ImmediateOperand(constant);
-          } else {
-            if (_state.labels.contains(identifier)) {
-              // Label
-              return ir.LabelOperand(identifier);
-            }
-          }
+        } else if (_state.constants.containsKey(identifier)) {
+          // Constant reference
+          return ir.ConstOperand(identifier);
+        } else if (_state.labels.contains(identifier)) {
+          // Label
+          return ir.LabelOperand(identifier);
         }
 
         throw new _CompileException(identifierExpression.identifier, 'Unknown identifier.');
@@ -258,12 +250,16 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   ir.MemoryOperand _convertMemoryOperand(ast.MemoryValue operand) {
     if (operand is ast.IdentifierExpression) {
+      // Label, constant, or register
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
 
       if (_state.labels.contains(identifier)) {
         // Label value
         return ir.LabelOperand(identifier);
+      } else if (_state.constants.containsKey(identifier)) {
+        // Constant reference
+        return ir.ConstOperand(identifier);
       } else {
         final ir.Register register = ir.stringToRegister(identifier);
 
@@ -284,19 +280,19 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   ir.DisplacementOperand _convertDisplacementOperand(ast.MemoryValue operand) {
     if (operand is ast.IdentifierExpression) {
+      // Label, constant, or register
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
 
       if (_state.labels.contains(identifier)) {
         // Label value
         return ir.LabelOperand(identifier);
-      } else {
-        final ir.Register register = ir.stringToRegister(identifier);
-
-        if (register != null) {
-          // Register value
-          throw new _CompileException(identifierExpression.identifier, 'Displacement operand cannot be a register.');
-        }
+      } else if (_state.constants.containsKey(identifier)) {
+        // Constant reference
+        return ir.ConstOperand(identifier);
+      } else if (ir.stringToRegister(identifier) != null) {
+        // Register value
+        throw new _CompileException(identifierExpression.identifier, 'Displacement operand cannot be a register.');
       }
     } else if (operand is ast.IntegerExpression) {
       // Integer

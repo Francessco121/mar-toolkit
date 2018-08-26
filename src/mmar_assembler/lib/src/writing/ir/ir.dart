@@ -1,4 +1,5 @@
 export 'comment.dart';
+export 'const_operand.dart';
 export 'constant.dart';
 export 'displacement_operand.dart';
 export 'displacement_operator.dart';
