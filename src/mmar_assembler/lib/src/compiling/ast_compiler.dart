@@ -1,3 +1,5 @@
+import 'package:mmar_assembler/src/parsing/ast/const_group_expression.dart';
+
 import '../scanning/token.dart';
 import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
@@ -376,6 +378,11 @@ class _AstConstExpressionVisitor implements ast.ConstExpressionVisitor {
     } else {
       throw new _CompileException(expression.operator_, 'Invalid binary operator.');
     }
+  }
+
+  @override
+  int visitConstGroupExpression(ConstGroupExpression expression) {
+    return _evaluate(expression.expression);
   }
 
   @override

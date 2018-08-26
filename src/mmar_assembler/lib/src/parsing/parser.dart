@@ -337,6 +337,23 @@ class Parser {
       return ast.IdentifierExpression(
         identifier: _advance()
       );
+    } else if (_check(TokenType.leftParen)) {
+      // Consume the '('
+      final Token leftParen =_advance();
+
+      // Grouping
+      final ast.ConstExpression innerExpression = _constExpression();
+
+      // Consume the ending ')'
+      final Token rightParen = _consume(TokenType.rightParen, 
+        "Expected ')' to end grouping expression."
+      );
+
+      return ast.ConstGroupExpression(
+        leftParen: leftParen,
+        expression: innerExpression,
+        rightParen: rightParen
+      );
     }
 
     throw _error(_advance(), 'Expected constant expression.');

@@ -47,7 +47,7 @@ memory              = '[' memory_value ( ( '-' | '+' ) memory_value )? ']' ;
 memory_value        = integer | IDENTIFIER ;
 
 const_expression    = const_value ( ( '-' | '+' ) const_value )* ;
-const_value         = integer | IDENTIFIER ;
+const_value         = integer | IDENTIFIER | '(' const_expression ')' ;
 
 integer             = INTEGER_BASE2 | INTEGER_BASE10 | INTEGER_BASE16 ;
 comment             = ';' COMMENT_TEXT ;

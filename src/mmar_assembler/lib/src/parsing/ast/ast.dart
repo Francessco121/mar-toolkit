@@ -3,6 +3,7 @@ export 'constant.dart';
 export 'const_binary_expression.dart';
 export 'const_expression.dart';
 export 'const_expression_visitor.dart';
+export 'const_group_expression.dart';
 export 'dw_directive.dart';
 export 'dw_operand.dart';
 export 'identifier_expression.dart';

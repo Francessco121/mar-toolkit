@@ -1,8 +1,11 @@
-ORG 0x1000
+ORG_VALUE equ 0x1000 + 0x1000
+
+ORG ORG_VALUE - 0x1000
 
 CONSTANT equ 56 + 5 - 1
+CONSTANT_2 equ CONSTANT + 4
 
-dw_label: DW 0x0200, 0x4000 DUP(5), "string" ; dw comment
+dw_label: DW 0x0200 + 0x0300, 0x5000 - (0x4000 - 0x1000) DUP(5 - 3), "string" ; dw comment
 
 ; test
 .text

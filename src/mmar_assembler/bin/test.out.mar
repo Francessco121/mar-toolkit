@@ -1,6 +1,8 @@
+ORG_VALUE EQU 0x2000
 ORG 0x1000
 CONSTANT EQU 0x3c
-dw_label: DW 0x200, 0x4000 DUP(0x5), "string" ; dw comment
+CONSTANT_2 EQU 0x40
+dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
 ; test
 .text
 label2:
