@@ -1,3 +1,6 @@
+import 'instruction_definition.dart';
+import 'instructions.dart';
+
 enum Mnemonic {
   add,
   and,
@@ -47,4 +50,22 @@ enum Mnemonic {
   test,
   xchg,
   xor
+}
+
+String mnemonicToString(Mnemonic mnemonic) {
+  final InstructionDefinition def = mnemonicsToInstructionDefs[mnemonic];
+
+  return def?.mnemonicText;
+}
+
+Mnemonic stringToMnemonic(String string) {
+  string = string.toLowerCase();
+
+  for (InstructionDefinition def in instructionDefinitions) {
+    if (def.mnemonicText == string) {
+      return def.mnemonic;
+    }
+  }
+
+  return null;
 }

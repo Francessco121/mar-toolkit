@@ -2,7 +2,6 @@ import '../scanning/token.dart';
 import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
-import '../instruction_defs.dart';
 import 'ast_compile_error.dart';
 import 'ast_compile_result.dart';
 
@@ -114,7 +113,7 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   @override
   void visitInstruction(ast.Instruction instruction) {
-    final ir.Mnemonic mnemonic = stringToMnemonic(instruction.mnemonic.lexeme);
+    final ir.Mnemonic mnemonic = ir.stringToMnemonic(instruction.mnemonic.lexeme);
 
     if (mnemonic == null) {
       throw new _CompileException(instruction.mnemonic, 'Unknown mnemonic.');
@@ -325,7 +324,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     Token operand2Token
   }) {
     // Get the instruction definition
-    final InstructionDefinition instructionDef = mnemonicsToInstructionDefs[mnemonic];
+    final ir.InstructionDefinition instructionDef = ir.mnemonicsToInstructionDefs[mnemonic];
 
     if (instructionDef == null) {
       throw new ArgumentError.value(mnemonic, 'mnemonic',
@@ -334,13 +333,13 @@ class _AstLineVisitor implements ast.LineVisitor {
     }
 
     // Get type flags for each operand
-    final int op1Flag = irOperandToTypeFlag(operand1);
-    final int op2Flag = irOperandToTypeFlag(operand2);
+    final int op1Flag = ir.operandToTypeFlag(operand1);
+    final int op2Flag = ir.operandToTypeFlag(operand2);
 
     // Validate operand 1
     if (!instructionDef.operand1.isFlagValid(op1Flag)) {
       throw new _CompileException(operand1Token, 
-        'Operand 1 of ${mnemonicToString(mnemonic)} cannot be ${operandTypeFlagToString(op1Flag)}. '
+        'Operand 1 of ${ir.mnemonicToString(mnemonic)} cannot be ${ir.operandTypeFlagToString(op1Flag)}. '
         'Valid types are: ${instructionDef.operand1.createHumanReadableTypeList()}.'
       );
     }
@@ -348,7 +347,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     // Validate operand 2
     if (!instructionDef.operand2.isFlagValid(op2Flag)) {
       throw new _CompileException(operand2Token, 
-        'Operand 2 of ${mnemonicToString(mnemonic)} cannot be ${operandTypeFlagToString(op2Flag)}. '
+        'Operand 2 of ${ir.mnemonicToString(mnemonic)} cannot be ${ir.operandTypeFlagToString(op2Flag)}. '
         'Valid types are: ${instructionDef.operand2.createHumanReadableTypeList()}.'
       );
     }
