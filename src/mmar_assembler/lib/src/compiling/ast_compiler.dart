@@ -266,6 +266,10 @@ class _AstLineVisitor implements ast.LineVisitor {
         if (register != null) {
           // Register value
           return ir.RegisterOperand(register);
+        } else {
+          throw new _CompileException(identifierExpression.identifier, 
+            'Unknown identifier.'
+          );
         }
       }
     } else if (operand is ast.IntegerExpression) {
