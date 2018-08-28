@@ -5,6 +5,48 @@ import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
 import '../assemble_error.dart';
+import 'identifier_extractor.dart';
+
+/// Compiles AST lines into a MAR IR.
+AstLineCompileResult compileAstLines(List<ast.Line> astLines, Identifiers identifiers) {
+  final List<ir.Line> irLines = [];
+  final List<AssembleError> errors = [];
+
+  // Compile the AST lines
+  final nodeVisitor = new _AstLineVisitor(identifiers);
+
+  for (ast.Line astLine in astLines) {
+    try {
+      astLine.accept(nodeVisitor);
+    } on _CompileException catch (ex) {
+      errors.add(AssembleError(ex.token.sourceSpan, ex.message));
+    }
+  }
+
+  // Merge sections, directives, and constants in a MAR friendly order
+
+  // The ORG directive comes first (if it was defined)
+  // (MAR does not support ORG values referencing constants so we can put it first)
+  if (nodeVisitor.orgDirective != null) {
+    irLines.add(nodeVisitor.orgDirective);
+  }
+
+  // Constants come before instructions and non-org directives 
+  // (MAR does not allow constants to be referenced unless they are declared above)
+  irLines.addAll(nodeVisitor.constants);
+
+  // Then each section in the order they appeared
+  nodeVisitor.sections.forEach((String sectionName, List<ir.Line> lines) {
+    irLines.add(ir.Section(sectionName));
+    irLines.addAll(lines);
+  });
+
+  // All set
+  return AstLineCompileResult(
+    lines: irLines,
+    errors: errors
+  );
+}
 
 class AstLineCompileResult {
   final List<ir.Line> lines;
@@ -18,63 +60,6 @@ class AstLineCompileResult {
       assert(errors != null);
 }
 
-/// Compiles AST lines into a MAR IR.
-class AstLineCompiler {
-  AstLineCompileResult compile(List<ast.Line> astLines) {
-    final List<ir.Line> irLines = [];
-    final List<AssembleError> errors = [];
-
-    // Compile the AST lines
-    final state = new _AstCompilerState();
-    final visitorResult = _AstLineVisitorResult();
-    final nodeVisitor = new _AstLineVisitor(state, visitorResult);
-
-    for (ast.Line astLine in astLines) {
-      try {
-        astLine.accept(nodeVisitor);
-      } on _CompileException catch (ex) {
-        errors.add(AssembleError(ex.token.sourceSpan, ex.message));
-      }
-    }
-
-    // Merge sections, directives, and constants in a MAR friendly order
-
-    // The ORG directive comes first (if it was defined)
-    // (MAR does not support ORG values referencing constants so we can put it first)
-    if (visitorResult.orgDirective != null) {
-      irLines.add(visitorResult.orgDirective);
-    }
-
-    // Constants come before instructions and non-org directives 
-    // (MAR does not allow constants to be referenced unless they are declared above)
-    irLines.addAll(visitorResult.constants);
-
-    // Then each section in the order they appeared
-    visitorResult.sections.forEach((String sectionName, List<ir.Line> lines) {
-      irLines.add(ir.Section(sectionName));
-      irLines.addAll(lines);
-    });
-
-    // All set
-    return AstLineCompileResult(
-      lines: irLines,
-      errors: errors
-    );
-  }
-}
-
-class _AstCompilerState {
-  final Map<String, int> constants = {};
-  final Set<String> labels = new Set();
-}
-
-class _AstLineVisitorResult {
-  ir.OrgDirective orgDirective;
-
-  final List<ir.Constant> constants = [];
-  final Map<String, List<ir.Line>> sections = {};
-}
-
 class _CompileException implements Exception {
   final String message;
   final Token token;
@@ -82,19 +67,28 @@ class _CompileException implements Exception {
   _CompileException(this.token, this.message);
 }
 
-class _AstLineVisitor implements ast.LineVisitor {
+class _AstLineVisitor implements ast.LineVisitor, ast.ConstExpressionVisitor {
+  /// The ORG directive or `null` if none were visited.
+  ir.OrgDirective get orgDirective => _orgDirective;
+
+  /// All constants that were visited.
+  final List<ir.Constant> constants = [];
+
+  /// All non-constants and non-org-directives that were visited,
+  /// grouped by the section they were defined under.
+  final Map<String, List<ir.Line>> sections = {};
+
+  ir.OrgDirective _orgDirective;
   String _currentSection;
   List<ir.Line> _currentSectionLines;
 
-  final _AstConstExpressionVisitor _expressionVisitor;
-  final _AstCompilerState _state;
-  final _AstLineVisitorResult _result;
+  final Map<String, int> _compiledConstants = {};
 
-  _AstLineVisitor(this._state, this._result)
-    : assert(_state != null),
-      assert(_result != null),
-      _expressionVisitor = new _AstConstExpressionVisitor(_state) {
-    
+  final Identifiers _identifiers;
+
+  _AstLineVisitor(this._identifiers)
+    : assert(_identifiers != null) {
+
     // Default to the text section
     _switchSection('text');
   }
@@ -108,20 +102,15 @@ class _AstLineVisitor implements ast.LineVisitor {
   void visitConstant(ast.Constant constant) {
     final String identifier = constant.identifier.lexeme;
 
-    // Don't allow users to redefine constants
-    if (_state.constants.containsKey(identifier)) {
-      throw new _CompileException(constant.identifier, 'Cannot redefine a constant.');
-    }
-
     // Compile the constant's value
-    final int value = _evaluateExpression(constant.expression);
+    final int value = _evaluate(constant.expression);
 
     // Store the compiled value so others can reference it
-    _state.constants[identifier] = value;
+    _compiledConstants[identifier] = value;
     
     // Add the constant line
-    _result.constants.add(ir.Constant(identifier, value,
-      comment: constant.comment?.literal as String
+    constants.add(ir.Constant(identifier, value,
+      comment: _extractComment(constant)
     ));
   }
 
@@ -136,10 +125,10 @@ class _AstLineVisitor implements ast.LineVisitor {
         operands.add(ir.DwOperand(stringLiteral.value));
       } else if (astOperand.value is ast.ConstExpression) {
         operands.add(ir.DwOperand(
-          _evaluateExpression(astOperand.value as ast.ConstExpression),
+          _evaluate(astOperand.value as ast.ConstExpression),
           duplicate: astOperand.duplicate == null
             ? null
-            : _evaluateExpression(astOperand.duplicate)
+            : _evaluate(astOperand.duplicate)
         ));
       } else {
         throw new _CompileException(dwDirective.dwToken, 
@@ -152,7 +141,7 @@ class _AstLineVisitor implements ast.LineVisitor {
 
     _addLine(ir.DwDirective(operands,
       label: dwDirective.label?.identifier?.lexeme,
-      comment: dwDirective.comment?.literal as String
+      comment: _extractComment(dwDirective)
     ));
   }
 
@@ -195,7 +184,7 @@ class _AstLineVisitor implements ast.LineVisitor {
       operand1: operand1,
       operand2: operand2,
       label: instruction.label?.identifier?.lexeme,
-      comment: instruction.comment?.literal as String
+      comment: _extractComment(instruction)
     ));
   }
 
@@ -203,25 +192,18 @@ class _AstLineVisitor implements ast.LineVisitor {
   void visitLabelLine(ast.LabelLine labelLine) {
     final String identifier = labelLine.label.identifier.lexeme;
 
-    // Don't allow users to redefine labels
-    if (_state.labels.contains(identifier)) {
-      throw new _CompileException(labelLine.label.identifier, 'Cannot redefine label.');
-    }
-
-    _state.labels.add(identifier);
-
-    _addLine(ir.Label(labelLine.label.identifier.lexeme, 
-      comment: labelLine.comment?.literal as String
+    _addLine(ir.Label(identifier, 
+      comment: _extractComment(labelLine)
     ));
   }
 
   @override
   void visitOrgDirective(ast.OrgDirective orgDirective) {
-    if (_result.orgDirective == null) {
-      final int value = _evaluateExpression(orgDirective.expression);
+    if (_orgDirective == null) {
+      final int value = _evaluate(orgDirective.expression);
 
-      _result.orgDirective = ir.OrgDirective(value,
-        comment: orgDirective.comment?.literal as String
+      _orgDirective = ir.OrgDirective(value,
+        comment: _extractComment(orgDirective)
       );
     } else {
       throw _CompileException(orgDirective.orgKeyword, "The 'org' directive cannot appear more than once.");
@@ -236,6 +218,41 @@ class _AstLineVisitor implements ast.LineVisitor {
     if (comment != null) {
       _addLine(ir.Comment(comment));
     }
+  }
+
+  @override
+  int visitConstBinaryExpression(ast.ConstBinaryExpression expression) {
+    int leftValue = _evaluate(expression.left);
+    int rightValue = _evaluate(expression.right);
+
+    if (expression.$operator.type == TokenType.plus) {
+      return leftValue + rightValue;
+    } else if (expression.$operator.type == TokenType.minus) {
+      return leftValue - rightValue;
+    } else {
+      throw new _CompileException(expression.$operator, 'Invalid binary operator.');
+    }
+  }
+
+  @override
+  int visitConstGroupExpression(ast.ConstGroupExpression expression) {
+    return _evaluate(expression.expression);
+  }
+
+  @override
+  int visitIdentifierExpression(ast.IdentifierExpression identifierExpression) {
+    int value = _compiledConstants[identifierExpression.identifier.lexeme];
+
+    if (value != null) {
+      return value;
+    } else {
+      throw new _CompileException(identifierExpression.identifier, 'Unknown constant identifier.');
+    }
+  }
+
+  @override
+  int visitIntegerExpression(ast.IntegerExpression integerExpression) {
+    return integerExpression.value;
   }
 
   ir.InstructionOperand _convertInstructionOperand(ast.InstructionOperand operand) {
@@ -257,10 +274,10 @@ class _AstLineVisitor implements ast.LineVisitor {
         if (register != null) {
           // Register
           return ir.RegisterOperand(register);
-        } else if (_state.constants.containsKey(identifier)) {
+        } else if (_identifiers.constants.contains(identifier)) {
           // Constant reference
           return ir.ConstOperand(identifier);
-        } else if (_state.labels.contains(identifier)) {
+        } else if (_identifiers.labels.contains(identifier)) {
           // Label
           return ir.LabelOperand(identifier);
         }
@@ -306,10 +323,10 @@ class _AstLineVisitor implements ast.LineVisitor {
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
 
-      if (_state.labels.contains(identifier)) {
+      if (_identifiers.labels.contains(identifier)) {
         // Label value
         return ir.LabelOperand(identifier);
-      } else if (_state.constants.containsKey(identifier)) {
+      } else if (_identifiers.constants.contains(identifier)) {
         // Constant reference
         return ir.ConstOperand(identifier);
       } else {
@@ -340,10 +357,10 @@ class _AstLineVisitor implements ast.LineVisitor {
       final ast.IdentifierExpression identifierExpression = operand;
       final String identifier = identifierExpression.identifier.lexeme;
 
-      if (_state.labels.contains(identifier)) {
+      if (_identifiers.labels.contains(identifier)) {
         // Label value
         return ir.LabelOperand(identifier);
-      } else if (_state.constants.containsKey(identifier)) {
+      } else if (_identifiers.constants.contains(identifier)) {
         // Constant reference
         return ir.ConstOperand(identifier);
       } else if (ir.stringToRegister(identifier) != null) {
@@ -409,8 +426,12 @@ class _AstLineVisitor implements ast.LineVisitor {
     }
   }
 
-  int _evaluateExpression(ast.ConstExpression expression) {
-    return expression.accept(_expressionVisitor);
+  String _extractComment(ast.Line line) {
+    return line.comment?.literal as String;
+  }
+
+  int _evaluate(ast.ConstExpression expression) {
+    return expression.accept(this);
   }
 
   void _addLine(ir.Line line) {
@@ -422,60 +443,14 @@ class _AstLineVisitor implements ast.LineVisitor {
       return;
     }
 
-    List<ir.Line> newSectionLines = _result.sections[section];
+    List<ir.Line> newSectionLines = sections[section];
 
     if (newSectionLines == null) {
       newSectionLines = [];
-      _result.sections[section] = newSectionLines;
+      sections[section] = newSectionLines;
     }
 
     _currentSection = section;
     _currentSectionLines = newSectionLines;
-  }
-}
-
-class _AstConstExpressionVisitor implements ast.ConstExpressionVisitor {
-  final _AstCompilerState _state;
-
-  _AstConstExpressionVisitor(this._state)
-    : assert(_state != null);
-
-  @override
-  int visitConstBinaryExpression(ast.ConstBinaryExpression expression) {
-    int leftValue = _evaluate(expression.left);
-    int rightValue = _evaluate(expression.right);
-
-    if (expression.$operator.type == TokenType.plus) {
-      return leftValue + rightValue;
-    } else if (expression.$operator.type == TokenType.minus) {
-      return leftValue - rightValue;
-    } else {
-      throw new _CompileException(expression.$operator, 'Invalid binary operator.');
-    }
-  }
-
-  @override
-  int visitConstGroupExpression(ast.ConstGroupExpression expression) {
-    return _evaluate(expression.expression);
-  }
-
-  @override
-  int visitIdentifierExpression(ast.IdentifierExpression identifierExpression) {
-    int value = _state.constants[identifierExpression.identifier.lexeme];
-
-    if (value != null) {
-      return value;
-    } else {
-      throw new _CompileException(identifierExpression.identifier, 'Unknown constant identifier.');
-    }
-  }
-
-  @override
-  int visitIntegerExpression(ast.IntegerExpression integerExpression) {
-    return integerExpression.value;
-  }
-
-  int _evaluate(ast.ConstExpression expression) {
-    return expression.accept(this);
   }
 }

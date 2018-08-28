@@ -7,7 +7,7 @@ SHARED_CONSTANT EQU 0x1234
 dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
 ; other.mmar
 ; other_2.mmar
-MOV X, SHARED_CONSTANT
+MOV X, [other_data]
 MOV B, 0x1000
 ; test
 label2:

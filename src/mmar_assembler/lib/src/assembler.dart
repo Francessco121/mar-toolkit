@@ -1,6 +1,8 @@
 import 'dart:io' as io;
 
 import 'compiling/ast_line_compiler.dart';
+import 'compiling/identifier_extractor.dart';
+import 'parsing/ast/ast.dart' as ast;
 import 'writing/text_writer.dart';
 import 'assemble_error.dart';
 import 'assembler_state.dart';
@@ -25,19 +27,22 @@ class Assembler {
     final state = AssemblerState(rootSource);
 
     // Parse file and compile macros (will handle other file includes)
-    final result = compileFileToLines(rootSource, state.sourceTree.root, state);
+    final resultTuple = compileFileToLines(rootSource, state.sourceTree.root, state);
 
-    final List<AssembleError> aggregatedErrors = result.item2;
+    final List<ast.Line> lines = resultTuple.item1;
+    final List<AssembleError> aggregatedErrors = resultTuple.item2;
+
+    // Extract identifiers
+    final IdentifierExtractionResult extractResult = extractIdentifiers(lines);
+    aggregatedErrors.addAll(extractResult.errors);
 
     // Compile the AST lines
-    final compiler = new AstLineCompiler();
-    final AstLineCompileResult compileResult = compiler.compile(result.item1);
-
+    final AstLineCompileResult compileResult = compileAstLines(lines, extractResult.identifiers);
     aggregatedErrors.addAll(compileResult.errors);
 
     if (aggregatedErrors.isNotEmpty) {
       // Don't output assembly if an assemble error occurred
-      return AssembleResult(errors: result.item2);
+      return AssembleResult(errors: aggregatedErrors);
     } else {
       // Write the IR to a textual MAR form
       final writer = new TextWriter();
