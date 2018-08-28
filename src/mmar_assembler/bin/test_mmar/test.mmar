@@ -7,10 +7,12 @@ CONSTANT_2 equ CONSTANT + 4
 
 dw_label: DW 0x0200 + 0x0300, 0x5000 - (0x4000 - 0x1000) DUP(5 - 3), "string" ; dw comment
 
-#include "other.mar"
+#include "other.mmar"
 
 ; test
 .text
+  #include "other_2.mmar"
+
   label2:
     label: mov A, 3 ; comment
     jmp label2

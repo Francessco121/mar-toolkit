@@ -1,0 +1,5 @@
+; other.mmar
+
+#include "other_2.mmar"
+
+mov B, 0x1000

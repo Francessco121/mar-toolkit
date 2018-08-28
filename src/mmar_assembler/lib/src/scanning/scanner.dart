@@ -4,6 +4,7 @@ import 'package:source_span/source_span.dart';
 import 'package:string_scanner/string_scanner.dart';
 
 import '../assemble_error.dart';
+import '../source.dart';
 import 'token.dart';
 import 'token_type.dart';
 
@@ -65,10 +66,9 @@ class Scanner {
 
   final StringScanner _scanner;
 
-  Scanner(String content, Uri uri)
-    : assert(content != null),
-      assert(uri != null),
-      _scanner = StringScanner(content, sourceUrl: uri);
+  Scanner(Source source)
+    : assert(source != null),
+      _scanner = StringScanner(source.contents, sourceUrl: source.uri);
 
   ScanResult scan() {
     // Prep

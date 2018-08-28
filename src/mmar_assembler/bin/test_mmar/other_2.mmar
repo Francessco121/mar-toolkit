@@ -1,0 +1,5 @@
+; other_2.mmar
+
+#once
+
+SHARED_CONSTANT equ 0x1234

@@ -5,15 +5,21 @@ import 'parsing/ast/ast.dart' as ast;
 import 'parsing/parser.dart';
 import 'scanning/scanner.dart';
 import 'assemble_error.dart';
+import 'assembler_state.dart';
+import 'source.dart';
+import 'source_tree.dart';
 
-Tuple2<List<ast.Line>, List<AssembleError>> compileFileToLines(String fileContents, Uri fileUri) {
-  assert(fileContents != null);
-  assert(fileUri != null);
+Tuple2<List<ast.Line>, List<AssembleError>> compileFileToLines(
+  Source source, SourceTreeNode sourceTreeNode, AssemblerState state
+) {
+  assert(source != null);
+  assert(sourceTreeNode != null);
+  assert(state != null);
 
   final List<AssembleError> aggregatedErrors = [];
 
   // Scan the file
-  final scanner = new Scanner(fileContents, fileUri);
+  final scanner = new Scanner(source);
   final ScanResult scanResult = scanner.scan();
 
   aggregatedErrors.addAll(scanResult.errors);
@@ -25,8 +31,14 @@ Tuple2<List<ast.Line>, List<AssembleError>> compileFileToLines(String fileConten
   aggregatedErrors.addAll(parseResult.errors);
 
   // Compile macros
-  final macroCompiler = new MacroCompiler();
-  final MacroCompileResult macroCompileResult = macroCompiler.compile(parseResult.statements, fileUri);
+  final macroCompiler = new MacroCompiler(
+    source: source,
+    sourceTreeNode: sourceTreeNode, 
+    statements: parseResult.statements,
+    assemblerState: state
+  );
+
+  final MacroCompileResult macroCompileResult = macroCompiler.compile();
 
   aggregatedErrors.addAll(macroCompileResult.errors);
 

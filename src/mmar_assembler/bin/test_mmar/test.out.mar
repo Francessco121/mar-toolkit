@@ -3,7 +3,9 @@ ORG 0x1000
 CONSTANT EQU 0x3c
 CONSTANT_2 EQU 0x40
 dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
-; other.mar
+; other.mmar
+; other_2.mmar
+SHARED_CONSTANT EQU 0x1234
 MOV B, 0x1000
 ; test
 .text
