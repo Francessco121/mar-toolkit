@@ -1,6 +1,6 @@
 import 'dart:io' as io;
 
-import 'compiling/ast_compiler.dart';
+import 'compiling/ast_line_compiler.dart';
 import 'writing/text_writer.dart';
 import 'assemble_error.dart';
 import 'assembler_state.dart';
@@ -30,8 +30,8 @@ class Assembler {
     final List<AssembleError> aggregatedErrors = result.item2;
 
     // Compile the AST lines
-    final compiler = new AstCompiler();
-    final AstCompileResult compileResult = compiler.compile(result.item1);
+    final compiler = new AstLineCompiler();
+    final AstLineCompileResult compileResult = compiler.compile(result.item1);
 
     aggregatedErrors.addAll(compileResult.errors);
 

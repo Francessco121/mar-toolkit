@@ -431,19 +431,6 @@ class Parser {
     return false;
   }
 
-  /// Checks if the current token is of any of the given [types].
-  /// 
-  /// If it does match, this method consumes it and returns `true`, otherwise it does
-  /// not advance and returns `false`.
-  bool _matchAny(List<TokenType> types) {
-    if (_checkAny(types)) {
-      _advance();
-      return true;
-    }
-
-    return false;
-  }
-
   /// Consumes the current token if it is of the given [type]
   /// and returns the next token.
   /// 

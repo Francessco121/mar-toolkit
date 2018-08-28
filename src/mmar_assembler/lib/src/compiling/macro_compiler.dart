@@ -152,6 +152,7 @@ class _MacroVisitor implements ast.MacroVisitor {
       // Ignore the include if the included source was marked with the once macro
       // and has already been parsed and had its macros compiled.
       if (!includedSource.includedOnce) {
+        // Check for a cyclic include
         final cyclicParent = _sourceTreeNode.getAncestor(includedUri);
         if (cyclicParent != null) {
           _addCyclicIncludeError(includeMacro, includedUri, cyclicParent);

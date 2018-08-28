@@ -6,11 +6,11 @@ import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
 import '../assemble_error.dart';
 
-class AstCompileResult {
+class AstLineCompileResult {
   final List<ir.Line> lines;
   final List<AssembleError> errors;
 
-  AstCompileResult({
+  AstLineCompileResult({
     @required this.lines,
     @required this.errors
   })
@@ -18,9 +18,9 @@ class AstCompileResult {
       assert(errors != null);
 }
 
-/// Compiles a Macro MAR AST into a MAR IR.
-class AstCompiler {
-  AstCompileResult compile(List<ast.Line> astLines) {
+/// Compiles AST lines into a MAR IR.
+class AstLineCompiler {
+  AstLineCompileResult compile(List<ast.Line> astLines) {
     final List<ir.Line> irLines = [];
     final List<AssembleError> errors = [];
 
@@ -35,7 +35,7 @@ class AstCompiler {
       }
     }
 
-    return AstCompileResult(
+    return AstLineCompileResult(
       lines: irLines,
       errors: errors
     );
