@@ -2,4 +2,4 @@
 
 ## Contents
 - [High Level MAR Language Documentation](./hlml)
-- [Macro MAR Assembly Language Documentation](./mar)
+- [Macro MAR Assembly Language Documentation](./mmar)
