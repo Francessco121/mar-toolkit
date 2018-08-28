@@ -5,7 +5,9 @@ import 'line_visitor.dart';
 
 @immutable
 class OrgDirective implements Line {
+  @override
   final String comment;
+  
   final int value;
 
   const OrgDirective(this.value, {this.comment});

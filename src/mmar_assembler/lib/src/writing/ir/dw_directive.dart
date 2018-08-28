@@ -7,8 +7,12 @@ import 'line_visitor.dart';
 
 @immutable
 class DwDirective implements Labelable, Line {
+  @override
   final String comment;
+  
+  @override
   final String label;
+
   final List<DwOperand> operands;
 
   const DwDirective(this.operands, {this.label, this.comment});

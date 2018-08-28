@@ -6,7 +6,10 @@ import 'line_visitor.dart';
 
 @immutable
 class Label implements Labelable, Line {
+  @override
   final String comment;
+
+  @override
   final String label;
 
   const Label(this.label, {this.comment});

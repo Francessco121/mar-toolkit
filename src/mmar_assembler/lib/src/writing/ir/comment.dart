@@ -5,6 +5,7 @@ import 'line_visitor.dart';
 
 @immutable
 class Comment implements Line {
+  @override
   final String comment;
 
   const Comment(this.comment);

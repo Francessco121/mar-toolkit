@@ -10,7 +10,7 @@ class InstructionDefinition {
   final InstructionOperandDefintion operand1;
   final InstructionOperandDefintion operand2;
 
-  InstructionDefinition({
+  const InstructionDefinition({
     @required this.mnemonic,
     @required this.mnemonicText,
     @required this.operand1,
@@ -43,7 +43,7 @@ class InstructionOperandDefintion {
   /// - "memory or register"
   /// - "memory, immediate, or register"
   String createHumanReadableTypeList() {
-    if (_validTypes == null || _validTypes.length == 0) {
+    if (_validTypes == null || _validTypes.isEmpty) {
       // No types
       return operandTypeFlagToString(noOp);
     } else if (_validTypes.length == 1) {

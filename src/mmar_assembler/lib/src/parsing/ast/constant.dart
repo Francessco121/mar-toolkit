@@ -7,7 +7,9 @@ import 'line_visitor.dart';
 
 @immutable
 class Constant implements Line {
+  @override
   final Token comment;
+  
   final Token identifier;
   final Token equToken;
   final ConstExpression expression;

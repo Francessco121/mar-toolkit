@@ -8,7 +8,9 @@ import 'line_visitor.dart';
 
 @immutable
 class DwDirective implements Line {
+  @override
   final Token comment;
+  
   final Label label;
   final Token dwToken;
   final List<DwOperand> operands;

@@ -58,7 +58,7 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   @override
   void visitComment(ast.Comment comment) {
-    _lines.add(ir.Comment(comment.comment.literal));
+    _lines.add(ir.Comment(comment.comment.literal as String));
   }
 
   @override
@@ -78,7 +78,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     
     // Add the constant line
     _lines.add(ir.Constant(identifier, value,
-      comment: constant.comment?.literal
+      comment: constant.comment?.literal as String
     ));
   }
 
@@ -93,7 +93,7 @@ class _AstLineVisitor implements ast.LineVisitor {
         operands.add(ir.DwOperand(stringLiteral.value));
       } else if (astOperand.value is ast.ConstExpression) {
         operands.add(ir.DwOperand(
-          _evaluateExpression(astOperand.value),
+          _evaluateExpression(astOperand.value as ast.ConstExpression),
           duplicate: astOperand.duplicate == null
             ? null
             : _evaluateExpression(astOperand.duplicate)
@@ -109,7 +109,7 @@ class _AstLineVisitor implements ast.LineVisitor {
 
     _lines.add(ir.DwDirective(operands,
       label: dwDirective.label?.identifier?.lexeme,
-      comment: dwDirective.comment?.literal
+      comment: dwDirective.comment?.literal as String
     ));
   }
 
@@ -152,7 +152,7 @@ class _AstLineVisitor implements ast.LineVisitor {
       operand1: operand1,
       operand2: operand2,
       label: instruction.label?.identifier?.lexeme,
-      comment: instruction.comment?.literal
+      comment: instruction.comment?.literal as String
     ));
   }
 
@@ -168,7 +168,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     _state.labels.add(identifier);
 
     _lines.add(ir.Label(labelLine.label.identifier.lexeme, 
-      comment: labelLine.comment?.literal
+      comment: labelLine.comment?.literal as String
     ));
   }
 
@@ -177,14 +177,14 @@ class _AstLineVisitor implements ast.LineVisitor {
     final int value = _evaluateExpression(orgDirective.expression);
 
     _lines.add(ir.OrgDirective(value,
-      comment: orgDirective.comment?.literal
+      comment: orgDirective.comment?.literal as String
     ));
   }
 
   @override
   void visitSection(ast.Section section) {
     _lines.add(ir.Section(section.identifier.lexeme,
-      comment: section.comment?.literal
+      comment: section.comment?.literal as String
     ));
   }
 
@@ -236,10 +236,10 @@ class _AstLineVisitor implements ast.LineVisitor {
         final ir.DisplacementOperand operand =
           _convertDisplacementOperand(memoryReference.displacementValue);
 
-        final ir.DisplacementOperator operator_ = 
+        final ir.DisplacementOperator $operator = 
           _convertDisplacementOperator(memoryReference.displacementOperator);
 
-        displacement = ir.Displacement(operator_, operand);
+        displacement = ir.Displacement($operator, operand);
       }
 
       return ir.MemoryInstructionOperand(memoryOperand, 
@@ -330,7 +330,7 @@ class _AstLineVisitor implements ast.LineVisitor {
 
     if (instructionDef == null) {
       throw new ArgumentError.value(mnemonic, 'mnemonic',
-        '${mnemonic} has no corresponding instruction definition!'
+        '$mnemonic has no corresponding instruction definition!'
       );
     }
 
@@ -371,12 +371,12 @@ class _AstConstExpressionVisitor implements ast.ConstExpressionVisitor {
     int leftValue = _evaluate(expression.left);
     int rightValue = _evaluate(expression.right);
 
-    if (expression.operator_.type == TokenType.plus) {
+    if (expression.$operator.type == TokenType.plus) {
       return leftValue + rightValue;
-    } else if (expression.operator_.type == TokenType.minus) {
+    } else if (expression.$operator.type == TokenType.minus) {
       return leftValue - rightValue;
     } else {
-      throw new _CompileException(expression.operator_, 'Invalid binary operator.');
+      throw new _CompileException(expression.$operator, 'Invalid binary operator.');
     }
   }
 

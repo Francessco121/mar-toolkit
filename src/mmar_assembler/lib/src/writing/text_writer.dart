@@ -51,7 +51,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
       }
 
       if (operand.value is int) {
-        _buffer.write(_integerAsString(operand.value));
+        _buffer.write(_integerAsString(operand.value as int));
       } else {
         _buffer.write('"${operand.value}"');
       }
@@ -142,7 +142,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
 
       if (memory.displacement != null) {
         _buffer.write(' ');
-        _buffer.write(ir.displacementOperatorToString(memory.displacement.operator_));
+        _buffer.write(ir.displacementOperatorToString(memory.displacement.$operator));
         _buffer.write(' ');
 
         _writeDisplacementOperand(memory.displacement.value);

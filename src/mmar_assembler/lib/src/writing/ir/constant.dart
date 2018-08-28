@@ -5,7 +5,9 @@ import 'line_visitor.dart';
 
 @immutable
 class Constant implements Line {
+  @override
   final String comment;
+  
   final String identifier;
   final int value;
 

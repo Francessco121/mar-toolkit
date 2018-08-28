@@ -8,8 +8,12 @@ import 'mnemonic.dart';
 
 @immutable
 class Instruction implements Labelable, Line {
+  @override
   final String comment;
+  
+  @override
   final String label;
+
   final Mnemonic mnemonic;
   final InstructionOperand operand1;
   final InstructionOperand operand2;

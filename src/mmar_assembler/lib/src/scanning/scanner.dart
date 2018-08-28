@@ -8,7 +8,7 @@ import 'token.dart';
 import 'token_type.dart';
 
 /// A map of literal keywords to their respected [TokenType].
-const Map<String, TokenType> _keywords = const {
+const Map<String, TokenType> _keywords = {
   'dup': TokenType.dup,
   'dw': TokenType.dw,
   'equ': TokenType.equ,
@@ -17,7 +17,7 @@ const Map<String, TokenType> _keywords = const {
 
 /// A map of characters (which represent a single token as 1 character) 
 /// to their respected [TokenType].
-const Map<int, TokenType> _singleTokenTypes = const {
+const Map<int, TokenType> _singleTokenTypes = {
   $colon: TokenType.colon,
   $comma: TokenType.comma,
   $dot: TokenType.dot,
@@ -130,7 +130,7 @@ class Scanner {
           } else {
             _currentOffset++;
             _currentColumn++;
-            _addError("Unexpected character.");
+            _addError('Unexpected character.');
           }
 
           break;
@@ -186,7 +186,7 @@ class Scanner {
 
     // Check if it's an unterminated string
     if (_isAtEnd()) {
-      _addError("Unterminated string.");
+      _addError('Unterminated string.');
       return;
     }
 

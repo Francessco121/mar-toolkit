@@ -7,7 +7,9 @@ import 'line_visitor.dart';
 
 @immutable
 class LabelLine implements Line {
+  @override
   final Token comment;
+  
   final Label label;
 
   const LabelLine({

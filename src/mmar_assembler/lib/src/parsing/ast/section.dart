@@ -6,7 +6,9 @@ import 'line_visitor.dart';
 
 @immutable
 class Section implements Line {
+  @override
   final Token comment;
+  
   final Token dotToken;
   final Token identifier;
 

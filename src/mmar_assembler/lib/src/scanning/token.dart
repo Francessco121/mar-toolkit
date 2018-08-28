@@ -11,7 +11,7 @@ class Token {
 
   String get lexeme => sourceSpan.text;
 
-  Token({
+  const Token({
     @required this.type,
     @required this.sourceSpan,
     this.literal = null

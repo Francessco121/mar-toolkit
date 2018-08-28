@@ -5,9 +5,9 @@ import 'displacement_operator.dart';
 
 @immutable
 class Displacement {
-  final DisplacementOperator operator_;
+  final DisplacementOperator $operator;
   final DisplacementOperand value;
 
-  const Displacement(this.operator_, this.value)
-    : assert(operator_ != null && value != null);
+  const Displacement(this.$operator, this.value)
+    : assert($operator != null && value != null);
 }

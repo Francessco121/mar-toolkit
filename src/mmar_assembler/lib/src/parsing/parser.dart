@@ -172,7 +172,7 @@ class Parser {
       return ast.DwOperand(
         value: ast.StringLiteral(
           token: stringToken,
-          value: stringToken.literal
+          value: stringToken.literal as String
         ),
         // String operands cannot use DUP
         dupToken: null,
@@ -241,7 +241,7 @@ class Parser {
       return ast.InstructionExpressionOperand(
         ast.IntegerExpression(
           token: integerToken,
-          value: integerToken.literal
+          value: integerToken.literal as int
         )
       );
     } else if (_check(TokenType.identifier)) {
@@ -294,7 +294,7 @@ class Parser {
 
       return ast.IntegerExpression(
         token: integerToken,
-        value: integerToken.literal
+        value: integerToken.literal as int
       );
     } else if (_check(TokenType.identifier)) {
       // Identifier
@@ -315,7 +315,7 @@ class Parser {
 
       expression = ast.ConstBinaryExpression(
         left: expression,
-        operator_: op,
+        $operator: op,
         right: right
       );
     }
@@ -330,7 +330,7 @@ class Parser {
 
       return ast.IntegerExpression(
         token: integerToken, 
-        value: integerToken.literal
+        value: integerToken.literal as int
       );
     } else if (_check(TokenType.identifier)) {
       // Identifier

@@ -7,7 +7,9 @@ import 'line_visitor.dart';
 
 @immutable
 class OrgDirective implements Line {
+  @override
   final Token comment;
+  
   final Token orgKeyword;
   final ConstExpression expression;
 

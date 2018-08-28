@@ -8,7 +8,9 @@ import 'line_visitor.dart';
 
 @immutable
 class Instruction implements Line {
+  @override
   final Token comment;
+  
   final Label label;
   final Token mnemonic;
   final InstructionOperand operand1;
