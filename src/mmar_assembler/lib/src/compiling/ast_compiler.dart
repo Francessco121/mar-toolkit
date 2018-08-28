@@ -1,5 +1,3 @@
-import 'package:mmar_assembler/src/parsing/ast/const_group_expression.dart';
-
 import '../scanning/token.dart';
 import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
@@ -381,7 +379,7 @@ class _AstConstExpressionVisitor implements ast.ConstExpressionVisitor {
   }
 
   @override
-  int visitConstGroupExpression(ConstGroupExpression expression) {
+  int visitConstGroupExpression(ast.ConstGroupExpression expression) {
     return _evaluate(expression.expression);
   }
 
