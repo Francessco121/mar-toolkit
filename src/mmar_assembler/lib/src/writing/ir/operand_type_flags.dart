@@ -1,3 +1,4 @@
+import 'const_operand.dart';
 import 'immediate_operand.dart';
 import 'instruction_operand.dart';
 import 'label_operand.dart';
@@ -36,6 +37,8 @@ int operandToTypeFlag(InstructionOperand operand) {
   } else if (operand is RegisterOperand) {
     return registerOp;
   } else if (operand is LabelOperand) {
+    return immediateOp;
+  } else if (operand is ConstOperand) {
     return immediateOp;
   }
 
