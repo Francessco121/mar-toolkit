@@ -24,8 +24,10 @@ class AstLineCompiler {
     final List<ir.Line> irLines = [];
     final List<AssembleError> errors = [];
 
+    // Compile the AST lines
     final state = new _AstCompilerState();
-    final nodeVisitor = new _AstLineVisitor(state, irLines);
+    final visitorResult = _AstLineVisitorResult();
+    final nodeVisitor = new _AstLineVisitor(state, visitorResult);
 
     for (ast.Line astLine in astLines) {
       try {
@@ -35,6 +37,25 @@ class AstLineCompiler {
       }
     }
 
+    // Merge sections, directives, and constants in a MAR friendly order
+
+    // The ORG directive comes first (if it was defined)
+    // (MAR does not support ORG values referencing constants so we can put it first)
+    if (visitorResult.orgDirective != null) {
+      irLines.add(visitorResult.orgDirective);
+    }
+
+    // Constants come before instructions and non-org directives 
+    // (MAR does not allow constants to be referenced unless they are declared above)
+    irLines.addAll(visitorResult.constants);
+
+    // Then each section in the order they appeared
+    visitorResult.sections.forEach((String sectionName, List<ir.Line> lines) {
+      irLines.add(ir.Section(sectionName));
+      irLines.addAll(lines);
+    });
+
+    // All set
     return AstLineCompileResult(
       lines: irLines,
       errors: errors
@@ -47,6 +68,13 @@ class _AstCompilerState {
   final Set<String> labels = new Set();
 }
 
+class _AstLineVisitorResult {
+  ir.OrgDirective orgDirective;
+
+  final List<ir.Constant> constants = [];
+  final Map<String, List<ir.Line>> sections = {};
+}
+
 class _CompileException implements Exception {
   final String message;
   final Token token;
@@ -55,18 +83,25 @@ class _CompileException implements Exception {
 }
 
 class _AstLineVisitor implements ast.LineVisitor {
+  String _currentSection;
+  List<ir.Line> _currentSectionLines;
+
   final _AstConstExpressionVisitor _expressionVisitor;
   final _AstCompilerState _state;
-  final List<ir.Line> _lines;
+  final _AstLineVisitorResult _result;
 
-  _AstLineVisitor(this._state, this._lines)
+  _AstLineVisitor(this._state, this._result)
     : assert(_state != null),
-      assert(_lines != null),
-      _expressionVisitor = new _AstConstExpressionVisitor(_state);
+      assert(_result != null),
+      _expressionVisitor = new _AstConstExpressionVisitor(_state) {
+    
+    // Default to the text section
+    _switchSection('text');
+  }
 
   @override
   void visitComment(ast.Comment comment) {
-    _lines.add(ir.Comment(comment.comment.literal as String));
+    _addLine(ir.Comment(comment.comment.literal as String));
   }
 
   @override
@@ -85,7 +120,7 @@ class _AstLineVisitor implements ast.LineVisitor {
     _state.constants[identifier] = value;
     
     // Add the constant line
-    _lines.add(ir.Constant(identifier, value,
+    _result.constants.add(ir.Constant(identifier, value,
       comment: constant.comment?.literal as String
     ));
   }
@@ -115,7 +150,7 @@ class _AstLineVisitor implements ast.LineVisitor {
       operandNumber++;
     }
 
-    _lines.add(ir.DwDirective(operands,
+    _addLine(ir.DwDirective(operands,
       label: dwDirective.label?.identifier?.lexeme,
       comment: dwDirective.comment?.literal as String
     ));
@@ -156,7 +191,7 @@ class _AstLineVisitor implements ast.LineVisitor {
       operand2Token: instruction.mnemonic
     );
 
-    _lines.add(ir.Instruction(mnemonic,
+    _addLine(ir.Instruction(mnemonic,
       operand1: operand1,
       operand2: operand2,
       label: instruction.label?.identifier?.lexeme,
@@ -175,25 +210,32 @@ class _AstLineVisitor implements ast.LineVisitor {
 
     _state.labels.add(identifier);
 
-    _lines.add(ir.Label(labelLine.label.identifier.lexeme, 
+    _addLine(ir.Label(labelLine.label.identifier.lexeme, 
       comment: labelLine.comment?.literal as String
     ));
   }
 
   @override
   void visitOrgDirective(ast.OrgDirective orgDirective) {
-    final int value = _evaluateExpression(orgDirective.expression);
+    if (_result.orgDirective == null) {
+      final int value = _evaluateExpression(orgDirective.expression);
 
-    _lines.add(ir.OrgDirective(value,
-      comment: orgDirective.comment?.literal as String
-    ));
+      _result.orgDirective = ir.OrgDirective(value,
+        comment: orgDirective.comment?.literal as String
+      );
+    } else {
+      throw _CompileException(orgDirective.orgKeyword, "The 'org' directive cannot appear more than once.");
+    }
   }
 
   @override
   void visitSection(ast.Section section) {
-    _lines.add(ir.Section(section.identifier.lexeme,
-      comment: section.comment?.literal as String
-    ));
+    _switchSection(section.identifier.lexeme);
+
+    final String comment = section.comment?.literal as String;
+    if (comment != null) {
+      _addLine(ir.Comment(comment));
+    }
   }
 
   ir.InstructionOperand _convertInstructionOperand(ast.InstructionOperand operand) {
@@ -369,6 +411,26 @@ class _AstLineVisitor implements ast.LineVisitor {
 
   int _evaluateExpression(ast.ConstExpression expression) {
     return expression.accept(_expressionVisitor);
+  }
+
+  void _addLine(ir.Line line) {
+    _currentSectionLines.add(line);
+  }
+
+  void _switchSection(String section) {
+    if (section == _currentSection) {
+      return;
+    }
+
+    List<ir.Line> newSectionLines = _result.sections[section];
+
+    if (newSectionLines == null) {
+      newSectionLines = [];
+      _result.sections[section] = newSectionLines;
+    }
+
+    _currentSection = section;
+    _currentSectionLines = newSectionLines;
   }
 }
 

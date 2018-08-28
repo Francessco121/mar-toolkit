@@ -3,3 +3,9 @@
 #once
 
 SHARED_CONSTANT equ 0x1234
+
+.data
+    other_data: DW 0x2000
+
+.text
+    mov X, SHARED_CONSTANT
