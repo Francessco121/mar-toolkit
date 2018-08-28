@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
 import '../parsing/ast/ast.dart' as ast;
+import '../scanning/token.dart';
 import '../assemble_error.dart';
 import '../utils.dart';
 
@@ -66,18 +67,29 @@ class _MacroVisitor implements ast.MacroVisitor {
     
     // Open the file
     final inputFile = new io.File(absolutePath);
-    final String fileContents = inputFile.readAsStringSync();
 
-    // Parse the compile and compile macros
-    final result = compileFileToLines(fileContents, inputFile.uri);
+    // Ensure the file exists
+    if (!inputFile.existsSync()) {
+      _addError(includeMacro.filePathToken, 'Could not find file.');
+    } else {
+      // Read the file
+      final String fileContents = inputFile.readAsStringSync();
 
-    // Add lines and errors
-    lines.addAll(result.item1);
-    errors.addAll(result.item2);
+      // Parse the compile and compile macros
+      final result = compileFileToLines(fileContents, inputFile.uri);
+
+      // Add lines and errors
+      lines.addAll(result.item1);
+      errors.addAll(result.item2);
+    }
   }
 
   @override
   void visitOnceMacro(ast.OnceMacro onceMacro) {
     // TODO: implement visitOnceMacro
+  }
+
+  void _addError(Token token, String message) {
+    errors.add(AssembleError(token.sourceSpan, message));
   }
 }
