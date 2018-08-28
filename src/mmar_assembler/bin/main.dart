@@ -31,8 +31,16 @@ int main(List<String> args) {
     return 1;
   }
 
+  // Time the assembly
+  final stopwatch = Stopwatch();
+  stopwatch.start();
+
   // Assemble the file
   final bool success = _assembleFile(inputFilePath, outputFilePath);
+
+  // Let the user know how long it took to assemble their program
+  stopwatch.stop();
+  print('Completed in ${stopwatch.elapsed}.');
 
   // Return the appropriate exit code
   return success ? 0 : 1;
