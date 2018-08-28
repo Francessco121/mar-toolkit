@@ -19,12 +19,21 @@ x* - Zero or more occurrences of x.
 ' ... ' - String terminal.
 
 | - Alteration.
+.. - No whitespace separator.
 ```
 
 ## Grammar
 ```dart
-program             = ( line ( NEWLINE line? )* )? ;
-line                = ( ( constant | section | labelable | label ) comment? ) | comment ;
+program             = ( statement ( NEWLINE statement? )* )? ;
+statement           = line | macro ;
+
+macro               = '#' .. macros ; 
+macros              = include_macro | once_macro ;
+include_macro       = INCLUDE STRING ;
+once_macro          = ONCE ;
+
+line                = ( line_content comment? ) | comment ;
+line_content        = constant | section | labelable | label ;
 
 constant            = IDENTIFIER EQU const_expression ;
 section             = '.' IDENTIFIER ;
@@ -62,10 +71,12 @@ DUP             = /dup/i ;
 DW              = /dw/i ;
 EQU             = /equ/i ;
 IDENTIFIER      = /[_a-zA-Z][_a-zA-Z0-9]*/ ;
+INCLUDE         = /include/i ;
 INTEGER_BASE2   = /0b[01]+/ ;
 INTEGER_BASE10  = /[0-9]+/ ;
 INTEGER_BASE16  = /0x[0-9a-fA-F]+/ ;
 NEWLINE         = /\r?\n/;
+ONCE            = /once/i ;
 ORG             = /org/i ;
 STRING          = /"(?:.|\\b|\\n|\\r|\\t|\\0|\\\\|\\")*"/ ;
 ```

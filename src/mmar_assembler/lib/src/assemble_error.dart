@@ -2,12 +2,9 @@ import 'package:meta/meta.dart';
 import 'package:source_span/source_span.dart';
 
 @immutable
-class ScanError {
+class AssembleError {
   final SourceSpan sourceSpan;
   final String message;
 
-  const ScanError({
-    @required this.sourceSpan,
-    @required this.message
-  });
+  const AssembleError(this.sourceSpan, this.message);
 }

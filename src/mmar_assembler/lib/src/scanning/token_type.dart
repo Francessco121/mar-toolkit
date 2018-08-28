@@ -21,6 +21,8 @@ enum TokenType {
   dup,
   dw,
   equ,
+  include,
+  once,
   org,
 
   // End-of-file

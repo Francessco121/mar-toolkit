@@ -1,15 +1,28 @@
+import 'package:meta/meta.dart';
+
 import '../scanning/token.dart';
 import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
-import 'ast_compile_error.dart';
-import 'ast_compile_result.dart';
+import '../assemble_error.dart';
+
+class AstCompileResult {
+  final List<ir.Line> lines;
+  final List<AssembleError> errors;
+
+  AstCompileResult({
+    @required this.lines,
+    @required this.errors
+  })
+    : assert(lines != null),
+      assert(errors != null);
+}
 
 /// Compiles a Macro MAR AST into a MAR IR.
 class AstCompiler {
   AstCompileResult compile(List<ast.Line> astLines) {
     final List<ir.Line> irLines = [];
-    final List<AstCompileError> errors = [];
+    final List<AssembleError> errors = [];
 
     final state = new _AstCompilerState();
     final nodeVisitor = new _AstLineVisitor(state, irLines);
@@ -18,10 +31,7 @@ class AstCompiler {
       try {
         astLine.accept(nodeVisitor);
       } on _CompileException catch (ex) {
-        errors.add(AstCompileError(
-          message: ex.message,
-          token: ex.token
-        ));
+        errors.add(AssembleError(ex.token.sourceSpan, ex.message));
       }
     }
 

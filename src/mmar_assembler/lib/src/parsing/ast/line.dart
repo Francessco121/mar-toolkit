@@ -1,8 +1,6 @@
-import '../../scanning/token.dart';
 import 'line_visitor.dart';
+import 'statement.dart';
 
-abstract class Line {
-  Token get comment;
-
+abstract class Line extends Statement {
   void accept(LineVisitor visitor);
 }

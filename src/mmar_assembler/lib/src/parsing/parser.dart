@@ -1,15 +1,28 @@
+import 'package:meta/meta.dart';
+
 import '../scanning/token.dart';
 import '../scanning/token_type.dart';
+import '../assemble_error.dart';
 import 'ast/ast.dart' as ast;
-import 'parse_error.dart';
-import 'parse_result.dart';
 
 class _ParseException implements Exception { }
+
+class ParseResult {
+  final List<AssembleError> errors;
+  final List<ast.Statement> statements;
+
+  ParseResult({
+    @required this.statements,
+    @required this.errors
+  })
+    : assert(statements != null),
+      assert(errors != null);
+}
 
 class Parser {
   int _current = 0;
 
-  final List<ParseError> _errors = [];
+  final List<AssembleError> _errors = [];
 
   final List<Token> _tokens;
 
@@ -17,17 +30,17 @@ class Parser {
     : assert(_tokens != null);
 
   ParseResult parse() {
-    List<ast.Line> lines = [];
+    final List<ast.Statement> statements = [];
 
     // Parse until EOF
     while (!_isAtEnd()) {
-      // Parse line
+      // Parse statement
       try {
-        // Note: [line] will be null if it was just a newline character
-        final ast.Line line = _line();
+        // Note: [statement] will be null if it was just a newline character
+        final ast.Statement statement = _statement();
 
-        if (line != null) {
-          lines.add(line);
+        if (statement != null) {
+          statements.add(statement);
         }
 
         // Parse newline or EOF
@@ -46,8 +59,39 @@ class Parser {
 
     // Parse complete!
     return ParseResult(
-      lines: lines,
+      statements: statements,
       errors: _errors
+    );
+  }
+
+  ast.Statement _statement() {
+    if (_check(TokenType.once)) {
+      // Once macro
+      return _onceMacro(_advance());
+    } else if (_check(TokenType.include)) {
+      // Include macro
+      return _includeMacro(_advance());
+    } else {
+      // Line
+      return _line();
+    }
+  }
+
+  ast.OnceMacro _onceMacro(Token onceKeyword) {
+    return ast.OnceMacro(
+      onceKeyword: onceKeyword,
+      comment: _comment()
+    );
+  }
+
+  ast.IncludeMacro _includeMacro(Token includeKeyword)  {
+    // Read the file path string
+    final Token filePathToken = _consume(TokenType.string, 'Expected include file path string.');
+
+    return ast.IncludeMacro(
+      includeKeyword: includeKeyword,
+      filePathToken: filePathToken,
+      comment: _comment()
     );
   }
 
@@ -369,10 +413,7 @@ class Parser {
   }
 
   _ParseException _error(Token token, String message) {
-    _errors.add(ParseError(
-      token: token,
-      message: message
-    ));
+    _errors.add(AssembleError(token.sourceSpan, message));
 
     return _ParseException();
   }

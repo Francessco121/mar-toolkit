@@ -1,9 +1,9 @@
 import 'package:charcode/charcode.dart';
+import 'package:meta/meta.dart';
 import 'package:source_span/source_span.dart';
 import 'package:string_scanner/string_scanner.dart';
 
-import 'scan_error.dart';
-import 'scan_result.dart';
+import '../assemble_error.dart';
 import 'token.dart';
 import 'token_type.dart';
 
@@ -13,6 +13,12 @@ const Map<String, TokenType> _keywords = {
   'dw': TokenType.dw,
   'equ': TokenType.equ,
   'org': TokenType.org
+};
+
+/// A map of literal macro keywords to their respected [TokenType].
+const Map<String, TokenType> _macroKeywords = {
+  'once': TokenType.once,
+  'include': TokenType.include
 };
 
 /// A map of characters (which represent a single token as 1 character) 
@@ -29,6 +35,16 @@ const Map<int, TokenType> _singleTokenTypes = {
   $rparen: TokenType.rightParen
 };
 
+class ScanResult {
+  final List<AssembleError> errors;
+  final List<Token> tokens;
+
+  ScanResult({
+    @required this.tokens,
+    @required this.errors
+  });
+}
+
 class Scanner {
   /// The offset which [_lexemeBuffer] currently starts at.
   int _startOffset;
@@ -44,7 +60,7 @@ class Scanner {
   int _current;
 
   final List<Token> _tokens = [];
-  final List<ScanError> _errors = [];
+  final List<AssembleError> _errors = [];
   final StringBuffer _lexemeBuffer = StringBuffer();
 
   final StringScanner _scanner;
@@ -105,6 +121,9 @@ class Scanner {
           break;
         case $quote:
           _string();
+          break;
+        case $hash:
+          _macroKeyword();
           break;
         case $space:
         case $tab:
@@ -338,19 +357,37 @@ class Scanner {
     final String text = _lexemeBuffer.toString();
 
     // Check if the text is a keyword, otherwise fallback to an identifier
-    TokenType type = _keywords[text.toLowerCase()] ?? TokenType.identifier;
+    final TokenType type = _keywords[text.toLowerCase()] ?? TokenType.identifier;
 
     // Add the token
     _addToken(type, currentLexeme: text);
   }
 
+  void _macroKeyword() {
+    // Read all alpha characters
+    while (_isAlpha(_peek())) {
+      _advance();
+    }
+
+    final String lexeme = _lexemeBuffer.toString();
+
+    // Strip off leading '#'
+    final String macroText = lexeme.substring(1);
+
+    // Map the string literal to a macro keyword
+    final TokenType type = _macroKeywords[macroText.toLowerCase()];
+
+    if (type == null) {
+      _addError('Unknown macro.');
+    } else {
+      _addToken(type, currentLexeme: lexeme);
+    }
+  }
+
   void _addError(String message, {SourceSpan span}) {
     span ??= _createSourceSpanForCurrent();
 
-    _errors.add(ScanError(
-      message: message,
-      sourceSpan: span
-    ));
+    _errors.add(AssembleError(span, message));
   }
 
   /// Pass the [currentLexeme] if it has already been read to avoid redundency,

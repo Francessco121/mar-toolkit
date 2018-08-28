@@ -1,4 +1,2 @@
-export 'scanning.dart';
-export 'parsing.dart';
-export 'compiling.dart';
-export 'writing.dart';
+export 'src/assemble_error.dart';
+export 'src/assembler.dart';
