@@ -1,19 +1,23 @@
 ORG 0x1000
+
 ORG_VALUE EQU 0x2000
 CONSTANT EQU 0x3c
 CONSTANT_2 EQU 0x40
 SHARED_CONSTANT EQU 0x1234
+
 .text
-dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
-; other.mmar
-; other_2.mmar
-MOV X, [other_data]
-MOV B, 0x1000
-; test
-label2:
-label: MOV A, 0x3 ; comment
-JMP label2
-MOV [A + CONSTANT], 0x3
-BRK
+  MOV X, [other_data]
+  MOV B, 0x1000
+  ; test
+
+  label2:
+    label: MOV A, 0x3 ; comment
+    JMP label2
+    MOV [A + CONSTANT], 0x3
+    BRK
+
 .data
-other_data: DW 0x2000
+  dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
+  ; other.mmar
+  ; other_2.mmar
+  other_data: DW 0x2000

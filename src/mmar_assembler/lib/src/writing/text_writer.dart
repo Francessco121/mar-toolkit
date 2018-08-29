@@ -16,21 +16,25 @@ class TextWriter {
 }
 
 class _TextWriterLineVisitor implements ir.LineVisitor {
-  final StringBuffer _buffer;
+  bool _inSection = false;
+  int _indents = 0;
 
-  // TODO: indentation
-  // TODO: debug vs release modes
+  final StringBuffer _buffer;
 
   _TextWriterLineVisitor(this._buffer)
     : assert(_buffer != null);
 
   @override
   void visitComment(ir.Comment comment) {
+    _writeIndentation();
+
     _buffer.writeln('; ${comment.comment}');
   }
 
   @override
   void visitConstant(ir.Constant constant) {
+    _writeIndentation();
+
     _buffer.write(constant.identifier);
     _buffer.write(' EQU ');
     _buffer.write(_integerAsString(constant.value));
@@ -40,6 +44,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
 
   @override
   void visitDwDirective(ir.DwDirective dwDirective) {
+    _writeIndentation();
     _writeLabelIfExists(dwDirective);
 
     _buffer.write('DW ');
@@ -71,6 +76,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
 
   @override
   void visitInstruction(ir.Instruction instruction) {
+    _writeIndentation();
     _writeLabelIfExists(instruction);
 
     _buffer.write(ir.mnemonicToString(instruction.mnemonic).toUpperCase());
@@ -91,6 +97,16 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
 
   @override
   void visitLabel(ir.Label label) {
+    _buffer.writeln();
+
+    if (_inSection) {
+      _indents = 1;
+      _writeIndentation();
+      _indents = 2;
+    } else {
+      _indents = 1;
+    }
+
     _buffer.write(label.label);
     _buffer.write(':');
     _buffer.writeln();
@@ -102,10 +118,15 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
     _buffer.write(_integerAsString(orgDirective.value));
     _writeCommentIfExists(orgDirective);
     _buffer.writeln();
+    _buffer.writeln();
   }
 
   @override
   void visitSection(ir.Section section) {
+    _inSection = true;
+    _indents = 1;
+
+    _buffer.writeln();
     _buffer.write('.${section.identifier}');
     _writeCommentIfExists(section);
     _buffer.writeln();
@@ -217,8 +238,13 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
     }
   }
 
+  void _writeIndentation() {
+    for (int i = 0; i < _indents; i++) {
+      _buffer.write('  ');
+    }
+  }
+
   String _integerAsString(int value) {
-    // TODO: Support other modes
     return '0x' + value.toRadixString(16);
   }
 }
