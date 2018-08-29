@@ -217,6 +217,27 @@ class Scanner {
     // Build the lexeme
     final String lexeme = _lexemeBuffer.toString();
 
+    // Convert the lexeme to a string literal (removes quotes and handles escape codes)
+    final String literal = _stringLexemeToLiteral(lexeme);
+    
+    // Create start and end source locations
+    final SourceSpan span = _createSourceSpanForCurrent(lexeme);
+
+    // Manually add the token
+    _tokens.add(Token(
+      type: TokenType.string,
+      literal: literal,
+      sourceSpan: span
+    ));
+  }
+
+  String _stringLexemeToLiteral(String lexeme) {
+    // Track our own temporary character positions so we can
+    // create source spans for escape sequences
+    int currentOffset = _startOffset;
+    int currentColumn = _currentColumn;
+    int currentLine = _currentLine;
+
     // Trim surrounding quotes and handle escape characters
     final StringBuffer buffer = new StringBuffer();
 
@@ -225,6 +246,16 @@ class Scanner {
 
     for (int i = 1; i < lexeme.length - 1; i++) {
       final int char = lexeme.codeUnitAt(i);
+
+      if (char == $lf) {
+        currentColumn = 0;
+        currentLine++;
+      } else {
+        currentOffset++;
+        currentColumn++;
+      }
+
+      currentOffset++;
 
       if (!justEscaped && prevChar == $backslash) {
         switch (char) {
@@ -257,8 +288,23 @@ class Scanner {
             buffer.writeCharCode($nul);
             break;
           default:
-            // TODO: This error should mark the actual character (and backslash) with the source span
-            _addError("Unexpected escape character '${String.fromCharCode(char)}'.");
+            _addError('Unexpected escape sequence.', 
+              span: SourceSpan(
+                SourceLocation(
+                  currentOffset - 1,
+                  column: currentColumn - 1,
+                  line: currentLine,
+                  sourceUrl: _scanner.sourceUrl
+                ),
+                SourceLocation(
+                  currentOffset + 1,
+                  column: currentColumn + 1,
+                  line: currentLine,
+                  sourceUrl: _scanner.sourceUrl
+                ),
+                lexeme.substring(i - 1, i + 1)
+              )
+            );
             break;
         }
 
@@ -275,17 +321,7 @@ class Scanner {
     }
 
     // Build the literal value
-    final String literal = buffer.toString();
-    
-    // Create start and end source locations
-    final SourceSpan span = _createSourceSpanForCurrent(lexeme);
-
-    // Manually add the token
-    _tokens.add(Token(
-      type: TokenType.string,
-      literal: literal,
-      sourceSpan: span
-    ));
+    return buffer.toString();
   }
 
   void _integer(int firstChar) {
