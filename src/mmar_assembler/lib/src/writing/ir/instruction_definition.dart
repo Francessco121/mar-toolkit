@@ -30,8 +30,7 @@ class InstructionOperandDefintion {
   /// Returns whether the given [typeFlag] is a valid operand type
   /// of this definition.
   bool isFlagValid(int typeFlag) {
-    return typeFlag & _validFlags != 0            // Flag has type
-      || (typeFlag == noOp && _validFlags == 0);  // or type is a noop and flags are nothing
+    return typeFlag & _validFlags != 0;
   }
 
   /// Returns a string with a list of valid operand types
@@ -75,19 +74,14 @@ class InstructionOperandDefintion {
   }
 
   static int _createOperandFlag(List<int> validTypes) {
-    // TODO: Instead of returning 0 for no types, should this instead
-    //       return [noOp]? This may simplify validation.
+    int flag = 0;
 
-    if (validTypes == null) {
-      return 0;
-    } else {
-      int flag = 0;
-
+    if (validTypes != null) {
       for (int operand in validTypes) {
         flag |= operand;
       }
-
-      return flag;
     }
+
+    return flag == 0 ? noOp : flag;
   }
 }
