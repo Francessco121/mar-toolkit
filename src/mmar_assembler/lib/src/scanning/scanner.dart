@@ -4,7 +4,6 @@ import 'package:source_span/source_span.dart';
 import 'package:string_scanner/string_scanner.dart';
 
 import '../assemble_error.dart';
-import '../bit_16_math.dart' as math_16;
 import '../source.dart';
 import 'token.dart';
 import 'token_type.dart';
@@ -338,64 +337,66 @@ class Scanner {
   void _integer(int firstChar) {
     int literal;
 
-    // Look for base prefixes first
-    if (firstChar == $0 && _peek() == $x) {
-      // Hexadecimal
+    try {
+      // Look for base prefixes first
+      if (firstChar == $0 && _peek() == $x) {
+        // Hexadecimal
 
-      // Consume the 'x'
-      _advance();
-
-      // Read hex number
-      while (_isBase16Digit(_peek())) {
+        // Consume the 'x'
         _advance();
-      }
 
-      // Build the literal string
-      final String literalString = _lexemeBuffer.toString()
-        .substring(2);
-      
-      // Convert the number
-      literal = int.parse(literalString, radix: 16);
-    } else if (firstChar == $0 && _peek() == $b) {
-      // Binary
+        // Read hex number
+        while (_isBase16Digit(_peek())) {
+          _advance();
+        }
 
-      // Consume the 'b'
-      _advance();
+        // Build the literal string
+        final String literalString = _lexemeBuffer.toString()
+          .substring(2);
+        
+        // Convert the number
+        literal = int.parse(literalString, radix: 16);
+      } else if (firstChar == $0 && _peek() == $b) {
+        // Binary
 
-      // Read binary number
-      while (_isBase2Digit(_peek())) {
+        // Consume the 'b'
         _advance();
+
+        // Read binary number
+        while (_isBase2Digit(_peek())) {
+          _advance();
+        }
+
+        // Build the literal string
+        final String literalString = _lexemeBuffer.toString()
+          .substring(2);
+        
+        // Convert the number
+        literal = int.parse(literalString, radix: 2);
+      } else {
+        // Decimal
+
+        // Read base 10 number
+        while (_isBase10Digit(_peek())) {
+          _advance();
+        }
+
+        // Build the literal string
+        final String literalString = _lexemeBuffer.toString();
+
+        // Convert the number
+        literal = int.parse(literalString);
       }
-
-      // Build the literal string
-      final String literalString = _lexemeBuffer.toString()
-        .substring(2);
-      
-      // Convert the number
-      literal = int.parse(literalString, radix: 2);
-    } else {
-      // Decimal
-
-      // Read base 10 number
-      while (_isBase10Digit(_peek())) {
-        _advance();
-      }
-
-      // Build the literal string
-      final String literalString = _lexemeBuffer.toString();
-
-      // Convert the number
-      literal = int.parse(literalString);
-    }
+    } on FormatException { /* Integer was not valid or overflowed. */ }
 
     // Add the token
-    _addToken(TokenType.integer, literal: literal);
+    _addToken(TokenType.integer, literal: literal ?? 0);
 
     // Note: Do this after adding the token so the character positions are correct for the source span
-    // Ensure the literal is within the bounds of a 16-bit number
-    if (literal > math_16.maxUnsigned16BitValue) {
-      // Note: Still add the token regardless since it's not technically an invalid token
-      _addError('Integer literal cannot be larger than 16-bits.');
+    if (literal == null) {
+      _addError(
+        'Integer literal cannot be larger than the maximum signed 64-bit value.'
+      );
     }
   }
 

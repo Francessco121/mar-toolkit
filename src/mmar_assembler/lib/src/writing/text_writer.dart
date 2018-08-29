@@ -1,5 +1,6 @@
 import 'package:charcode/charcode.dart';
 
+import '../bit_16_math.dart' as math_16;
 import 'ir/ir.dart' as ir;
 
 class TextWriter {
@@ -308,6 +309,8 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
   }
 
   String _integerAsString(int value) {
-    return '0x' + value.toRadixString(16);
+    final int u16Value = math_16.toUnsigned16BitInteger(value);
+    
+    return '0x' + u16Value.toRadixString(16);
   }
 }
