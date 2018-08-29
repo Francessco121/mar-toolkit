@@ -229,6 +229,12 @@ class _AstLineVisitor implements ast.LineVisitor, ast.ConstExpressionVisitor {
       return leftValue + rightValue;
     } else if (expression.$operator.type == TokenType.minus) {
       return leftValue - rightValue;
+    } else if (expression.$operator.type == TokenType.forwardSlash) {
+      return (leftValue / rightValue).floor();
+    } else if (expression.$operator.type == TokenType.star) {
+      return leftValue * rightValue;
+    } else if (expression.$operator.type == TokenType.percent) {
+      return leftValue % rightValue;
     } else {
       throw new _CompileException(expression.$operator, 'Invalid binary operator.');
     }

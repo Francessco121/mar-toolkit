@@ -28,12 +28,15 @@ const Map<int, TokenType> _singleTokenTypes = {
   $colon: TokenType.colon,
   $comma: TokenType.comma,
   $dot: TokenType.dot,
+  $slash: TokenType.forwardSlash,
   $lbracket: TokenType.leftBracket,
   $lparen: TokenType.leftParen,
   $minus: TokenType.minus,
+  $percent: TokenType.percent,
   $plus: TokenType.plus,
   $rbracket: TokenType.rightBracket,
-  $rparen: TokenType.rightParen
+  $rparen: TokenType.rightParen,
+  $asterisk: TokenType.star
 };
 
 class ScanResult {

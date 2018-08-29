@@ -3,12 +3,15 @@ enum TokenType {
   colon,
   comma,
   dot,
+  forwardSlash,
   leftBracket,
   leftParen,
   minus,
+  percent,
   plus,
   rightBracket,
   rightParen,
+  star,
 
   // Literals
   comment,

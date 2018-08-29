@@ -5,6 +5,9 @@ ORG ORG_VALUE - 0x1000
 CONSTANT equ 56 + 5 - 1
 CONSTANT_2 equ CONSTANT + 4
 CONSTANT_3 equ 0xFFFF + 0xFFFF
+CONSTANT_4 equ 2 * 3
+CONSTANT_5 equ 10 % 3
+CONSTANT_6 equ 5 / 2
 
 .data
 dw_label: DW 0x0200 + 0x0300, 0x5000 - (0x4000 - 0x1000) DUP(5 - 3), "string" ; dw comment

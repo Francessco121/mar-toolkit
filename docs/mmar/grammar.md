@@ -24,44 +24,45 @@ x* - Zero or more occurrences of x.
 
 ## Grammar
 ```dart
-program             = ( statement ( NEWLINE statement? )* )? ;
-statement           = line | macro ;
+program                 = ( statement ( NEWLINE statement? )* )? ;
+statement               = line | macro ;
 
-macro               = '#' .. macros ; 
-macros              = include_macro | once_macro ;
-include_macro       = INCLUDE STRING ;
-once_macro          = ONCE ;
+macro                   = '#' .. macros ; 
+macros                  = include_macro | once_macro ;
+include_macro           = INCLUDE STRING ;
+once_macro              = ONCE ;
 
-line                = ( line_content comment? ) | comment ;
-line_content        = constant | section | labelable | label ;
+line                    = ( line_content comment? ) | comment ;
+line_content            = constant | section | labelable | label ;
 
-constant            = IDENTIFIER EQU const_expression ;
-section             = '.' IDENTIFIER ;
-labelable           = label? ( instruction | directive ) ;
-label               = IDENTIFIER ':' ;
+constant                = IDENTIFIER EQU const_expression ;
+section                 = '.' IDENTIFIER ;
+labelable               = label? ( instruction | directive ) ;
+label                   = IDENTIFIER ':' ;
 
-directive           = org_directive | dw_directive ;
+directive               = org_directive | dw_directive ;
 
-org_directive       = ORG const_expression ;
+org_directive           = ORG const_expression ;
 
-dw_directive        = DW dw_operand ( ',' dw_operand )*;
-dw_operand          = dw_integer_operand | dw_string_operand ;
-dw_integer_operand  = const_expression ( DUP '(' const_expression ')' )? ;
-dw_string_operand   = STRING ;
+dw_directive            = DW dw_operand ( ',' dw_operand )*;
+dw_operand              = dw_integer_operand | dw_string_operand ;
+dw_integer_operand      = const_expression ( DUP '(' const_expression ')' )? ;
+dw_string_operand       = STRING ;
 
-instruction         = IDENTIFIER ( inst_operand ( ',' inst_operand )? )? ;
-inst_operand        = immediate | memory | IDENTIFIER ;
-immediate           = integer ;
-memory              = '[' memory_value ( ( '-' | '+' ) memory_value )? ']' ;
-memory_value        = integer | IDENTIFIER ;
+instruction             = IDENTIFIER ( inst_operand ( ',' inst_operand )? )? ;
+inst_operand            = immediate | memory | IDENTIFIER ;
+immediate               = integer ;
+memory                  = '[' memory_value ( ( '-' | '+' ) memory_value )? ']' ;
+memory_value            = integer | IDENTIFIER ;
 
-const_expression    = const_addition ;
-const_addition      = const_unary ( ( '-' | '+' ) const_unary )* ;
-const_unary         = ( '-' unary ) | const_value ;
-const_value         = integer | IDENTIFIER | '(' const_expression ')' ;
+const_expression        = const_addition ;
+const_addition          = const_multiplication ( ( '-' | '+' ) const_multiplication )* ;
+const_multiplication    = const_unary ( ( '/' | '*' | '%' ) const_unary )* ;
+const_unary             = ( '-' unary ) | const_value ;
+const_value             = integer | IDENTIFIER | '(' const_expression ')' ;
 
-integer             = INTEGER_BASE2 | INTEGER_BASE10 | INTEGER_BASE16 ;
-comment             = ';' COMMENT_TEXT ;
+integer                 = INTEGER_BASE2 | INTEGER_BASE10 | INTEGER_BASE16 ;
+comment                 = ';' COMMENT_TEXT ;
 ```
 
 ## Named Terminals

@@ -355,9 +355,26 @@ class Parser {
   }
 
   ast.ConstExpression _constAddition() {
-    ast.ConstExpression expression = _constUnary();
+    ast.ConstExpression expression = _constMultiplication();
 
     while (_checkAny(const [TokenType.minus, TokenType.plus])) {
+      final Token op = _advance();
+      final ast.ConstExpression right = _constMultiplication();
+
+      expression = ast.ConstBinaryExpression(
+        left: expression,
+        $operator: op,
+        right: right
+      );
+    }
+
+    return expression;
+  }
+
+  ast.ConstExpression _constMultiplication() {
+    ast.ConstExpression expression = _constUnary();
+
+    while (_checkAny(const [TokenType.forwardSlash, TokenType.star, TokenType.percent])) {
       final Token op = _advance();
       final ast.ConstExpression right = _constUnary();
 
