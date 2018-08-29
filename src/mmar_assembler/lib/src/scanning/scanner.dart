@@ -349,13 +349,14 @@ class Scanner {
         _advance();
 
         // Read hex number
-        while (_isBase16Digit(_peek())) {
+        while (_isBase16Digit(_peek()) || _peek() == $underscore) {
           _advance();
         }
 
         // Build the literal string
         final String literalString = _lexemeBuffer.toString()
-          .substring(2);
+          .substring(2)
+          .replaceAll('_', '');
         
         // Convert the number
         literal = int.parse(literalString, radix: 16);
@@ -366,13 +367,14 @@ class Scanner {
         _advance();
 
         // Read binary number
-        while (_isBase2Digit(_peek())) {
+        while (_isBase2Digit(_peek()) || _peek() == $underscore) {
           _advance();
         }
 
         // Build the literal string
         final String literalString = _lexemeBuffer.toString()
-          .substring(2);
+          .substring(2)
+          .replaceAll('_', '');
         
         // Convert the number
         literal = int.parse(literalString, radix: 2);
@@ -380,12 +382,13 @@ class Scanner {
         // Decimal
 
         // Read base 10 number
-        while (_isBase10Digit(_peek())) {
+        while (_isBase10Digit(_peek()) || _peek() == $underscore) {
           _advance();
         }
 
         // Build the literal string
-        final String literalString = _lexemeBuffer.toString();
+        final String literalString = _lexemeBuffer.toString()
+          .replaceAll('_', '');
 
         // Convert the number
         literal = int.parse(literalString);
