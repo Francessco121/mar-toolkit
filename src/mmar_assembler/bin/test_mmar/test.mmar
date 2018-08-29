@@ -7,6 +7,8 @@ CONSTANT_2 equ CONSTANT + 4
 
 .data
 dw_label: DW 0x0200 + 0x0300, 0x5000 - (0x4000 - 0x1000) DUP(5 - 3), "string" ; dw comment
+DW "\0yeet\t\neee
+      hhh\"hh"
 
 #include "other.mmar"
 

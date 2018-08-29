@@ -1,3 +1,5 @@
+import 'package:charcode/charcode.dart';
+
 import 'ir/ir.dart' as ir;
 
 class TextWriter {
@@ -58,7 +60,7 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
       if (operand.value is int) {
         _buffer.write(_integerAsString(operand.value as int));
       } else {
-        _buffer.write('"${operand.value}"');
+        _writeString(operand.value as String);
       }
 
       if (operand.duplicate != null) {
@@ -225,6 +227,48 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
     }
   }
 
+  void _writeString(String string) {
+    _buffer.write('"');
+
+    for (int i = 0; i < string.length; i++) {
+      int char = string.codeUnitAt(i);
+
+      switch (char) {
+        case $tab:
+          _buffer.write(r'\t');
+          break;
+        case $bs:
+          _buffer.write(r'\b');
+          break;
+        case $lf:
+          _buffer.write(r'\n');
+          break;
+        case $cr:
+          _buffer.write(r'\r');
+          break;
+        case $ff:
+          _buffer.write(r'\f');
+          break;
+        case $quote:
+          _buffer.write(r'\"');
+          break;
+        case $backslash:
+          _buffer.write(r'\\');
+          break;
+        default:
+          if (char < $space) {
+            // Encode invisible characters as unicode escape sequences
+            _buffer.write(_escapeAsUnicode(char));
+          } else {
+            _buffer.writeCharCode(char);
+          }
+          break;
+      }
+    }
+
+    _buffer.write('"');
+  }
+
   void _writeLabelIfExists(ir.Labelable labelable) {
     if (labelable.label != null) {
       _buffer.write(labelable.label);
@@ -241,6 +285,25 @@ class _TextWriterLineVisitor implements ir.LineVisitor {
   void _writeIndentation() {
     for (int i = 0; i < _indents; i++) {
       _buffer.write('  ');
+    }
+  }
+
+  String _escapeAsUnicode(int char) {
+    final String string = char.toRadixString(16);
+
+    if (string.length < 4) {
+      // MAR strings require unicode escape sequences to have exactly 4 digits
+      final buffer = new StringBuffer(r'\u');
+
+      for (int i = string.length; i < 4; i++) {
+        buffer.write('0');
+      }
+
+      buffer.write(string);
+
+      return buffer.toString();
+    } else {
+      return r'\u' + string;
     }
   }
 

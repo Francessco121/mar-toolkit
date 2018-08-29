@@ -18,6 +18,7 @@ SHARED_CONSTANT EQU 0x1234
 
 .data
   dw_label: DW 0x500, 0x2000 DUP(0x2), "string" ; dw comment
+  DW "\u0000yeet\t\neee\r\n      hhh\"hh"
   ; other.mmar
   ; other_2.mmar
   other_data: DW 0x2000
