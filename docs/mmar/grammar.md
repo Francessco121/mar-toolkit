@@ -55,7 +55,9 @@ immediate           = integer ;
 memory              = '[' memory_value ( ( '-' | '+' ) memory_value )? ']' ;
 memory_value        = integer | IDENTIFIER ;
 
-const_expression    = const_value ( ( '-' | '+' ) const_value )* ;
+const_expression    = const_addition ;
+const_addition      = const_unary ( ( '-' | '+' ) const_unary )* ;
+const_unary         = ( '-' unary ) | const_value ;
 const_value         = integer | IDENTIFIER | '(' const_expression ')' ;
 
 integer             = INTEGER_BASE2 | INTEGER_BASE10 | INTEGER_BASE16 ;

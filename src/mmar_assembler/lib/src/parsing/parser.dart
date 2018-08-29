@@ -351,11 +351,15 @@ class Parser {
   }
 
   ast.ConstExpression _constExpression() {
-    ast.ConstExpression expression = _constValue();
+    return _constAddition();
+  }
+
+  ast.ConstExpression _constAddition() {
+    ast.ConstExpression expression = _constUnary();
 
     while (_checkAny(const [TokenType.minus, TokenType.plus])) {
       final Token op = _advance();
-      final ast.ConstExpression right = _constValue();
+      final ast.ConstExpression right = _constUnary();
 
       expression = ast.ConstBinaryExpression(
         left: expression,
@@ -365,6 +369,20 @@ class Parser {
     }
 
     return expression;
+  }
+
+  ast.ConstExpression _constUnary() {
+    if (_check(TokenType.minus)) {
+      final Token $operator = _advance();
+      final ast.ConstExpression expression = _constUnary();
+
+      return ast.ConstUnaryExpression(
+        $operator: $operator,
+        expression: expression
+      );
+    }
+
+    return _constValue();
   }
 
   ast.ConstExpression _constValue() {

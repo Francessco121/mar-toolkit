@@ -240,6 +240,17 @@ class _AstLineVisitor implements ast.LineVisitor, ast.ConstExpressionVisitor {
   }
 
   @override
+  int visitConstUnaryExpression(ast.ConstUnaryExpression unary) {
+    int value = _evaluate(unary.expression);
+
+    if (unary.$operator.type == TokenType.minus) {
+      return -value;
+    } else {
+      throw new _CompileException(unary.$operator, 'Invalid unary operator.');
+    }
+  }
+
+  @override
   int visitIdentifierExpression(ast.IdentifierExpression identifierExpression) {
     int value = _compiledConstants[identifierExpression.identifier.lexeme];
 
