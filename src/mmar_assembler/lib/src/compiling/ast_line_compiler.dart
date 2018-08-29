@@ -5,6 +5,7 @@ import '../scanning/token_type.dart';
 import '../parsing/ast/ast.dart' as ast;
 import '../writing/ir/ir.dart' as ir;
 import '../assemble_error.dart';
+import '../bit_16_math.dart' as math_16;
 import 'identifier_extractor.dart';
 
 /// Compiles AST lines into a MAR IR.
@@ -226,9 +227,9 @@ class _AstLineVisitor implements ast.LineVisitor, ast.ConstExpressionVisitor {
     int rightValue = _evaluate(expression.right);
 
     if (expression.$operator.type == TokenType.plus) {
-      return leftValue + rightValue;
+      return math_16.$16BitAdd(leftValue, rightValue);
     } else if (expression.$operator.type == TokenType.minus) {
-      return leftValue - rightValue;
+      return math_16.$16BitSubtraction(leftValue, rightValue);
     } else {
       throw new _CompileException(expression.$operator, 'Invalid binary operator.');
     }

@@ -4,6 +4,7 @@ import 'package:source_span/source_span.dart';
 import 'package:string_scanner/string_scanner.dart';
 
 import '../assemble_error.dart';
+import '../bit_16_math.dart' as math_16;
 import '../source.dart';
 import 'token.dart';
 import 'token_type.dart';
@@ -325,9 +326,6 @@ class Scanner {
   }
 
   void _integer(int firstChar) {
-    // TODO: Handle format exceptions and overflows
-    //       Should probably enforce 16-bit values too
-
     int literal;
 
     // Look for base prefixes first
@@ -382,6 +380,13 @@ class Scanner {
 
     // Add the token
     _addToken(TokenType.integer, literal: literal);
+
+    // Note: Do this after adding the token so the character positions are correct for the source span
+    // Ensure the literal is within the bounds of a 16-bit number
+    if (literal > math_16.maxUnsigned16BitValue) {
+      // Note: Still add the token regardless since it's not technically an invalid token
+      _addError('Integer literal cannot be larger than 16-bits.');
+    }
   }
 
   void _identifierOrKeyword() {
