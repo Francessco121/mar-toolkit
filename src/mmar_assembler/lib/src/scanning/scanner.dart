@@ -190,8 +190,18 @@ class Scanner {
     _currentColumn++;
 
     // Read until end of string or EOF
+    bool justEscaped = false;
     int _lastChar;
-    while ((_peek() != $quote || _lastChar == $backslash) && !_isAtEnd()) {
+    while (!_isAtEnd()) {
+      // Deal with escaped double quotes
+      if (!justEscaped && _lastChar == $backslash) {
+        justEscaped = true;
+      } else if (_peek() == $quote) {
+        break;
+      } else {
+        justEscaped = false;
+      }
+
       _currentOffset++;
 
       if (_peek() == $lf) {
