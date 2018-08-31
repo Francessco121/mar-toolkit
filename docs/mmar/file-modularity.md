@@ -11,14 +11,13 @@ MMAR allows users to split code up into multiple files through the use of `#incl
 ## \#include
 
 ### Definition
-```c
+```asm
 #include "<file path string>"
 ```
 
 The `#include` macro loads the specified MMAR source file and inserts its code into the current file at the position of the `#include`. The file path may be absolute or relative to the file with the `#include`.
 
 #### Notes
-- Before code from another file is merged into the current file, the assembler compiles all macros in the included file.
 - Windows style file paths are supported when assembling on a Windows machine (though backslashes must still be escaped in the string. e.g. `"C:\\source.mmar"`).
 
 ### Example
@@ -54,11 +53,11 @@ The above 2 files would produce the following output:
 ## \#once
 
 ### Definition
-```c
+```asm
 #once
 ```
 
-The `#once` macro is a special statement which tells the assembler that the file it is in may only be included once. This **does not** mean that including the file twice will cause an error, instead all includes after the first will simply be ignored. Since identifiers do not need to be declared 'above' the code referencing them, this means that the `#once` macro can be used in a 'library' file that declares identifiers. The 'library' file can then be included by any other file that requires the identifiers from it, without needing to worry about the identifiers being redefined and causing an error. This is similar to using `#include` guards in C/C++ and `#pragma once` in C++.
+The `#once` macro is a special statement which tells the assembler that the file may only be included once. This **does not** mean that including the file twice will cause an error, instead all includes after the first will simply be ignored. Since identifiers do not need to be declared 'above' the code referencing them, this means that the `#once` macro can be used in a 'library' file that declares identifiers. The 'library' file can then be included by any other file that requires the identifiers from it, without needing to worry about the identifiers being redefined and causing an error. This is similar to using `#include` guards in C/C++ and `#pragma once` in C++.
 
 ### Example
 
