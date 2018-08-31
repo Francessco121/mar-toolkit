@@ -27,14 +27,15 @@ Notably memory and displacement operands do not currently support this.
 ## Operators
 The following is a list of valid operators that can be used in constant expressions:
 
-| Operation        | Symbol | Example        |
-| :--------------- | :----- | :------------- |
-| Negation         | `-`    | `-(50) = -50`* |
-| Addition         | `+`    | `2 + 5 = 7`    |
-| Subtraction      | `-`    | `10 - 4 = 6`   |
-| Multiplication   | `*`    | `2 * 6 = 12`   |
-| Integer Division | `/`    | `8 / 3 = 2`    |
-| Modulo           | `%`    | `10 % 3 = 1`   |
+| Operation        | Symbol | Example            |
+| :--------------- | :----- | :----------------- |
+| Negation         | `-`    | `-(50) = -50`*     |
+| Addition         | `+`    | `2 + 5 = 7`        |
+| Subtraction      | `-`    | `10 - 4 = 6`       |
+| Multiplication   | `*`    | `2 * 6 = 12`       |
+| Integer Division | `/`    | `8 / 3 = 2`        |
+| Modulo           | `%`    | `10 % 3 = 1`       |
+| Grouping         | `( )`  | `10 - (5 + 2) = 3` | 
 
 \* Parentheses are just for the example, `-50` is also valid but is not literally `-50` and instead is `50` negated at assemble-time.
 

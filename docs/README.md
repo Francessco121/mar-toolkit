@@ -1,5 +1,5 @@
 # HLML Toolkit Docs
 
 ## Contents
-- [High Level MAR Language Documentation](./hlml)
-- [Macro MAR Assembly Language Documentation](./mmar)
+- [(HLML) High Level MAR Language Documentation](./hlml)
+- [(MMAR) Macro MAR Assembly Language Documentation](./mmar)
