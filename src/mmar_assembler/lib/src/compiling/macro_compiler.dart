@@ -137,7 +137,7 @@ class _MacroVisitor implements ast.MacroVisitor {
       // Create a source tree node
       final includedSourceNode = _sourceTreeNode.addChild(includedUri);
 
-      // Parse the compile and compile macros
+      // Parse the file and compile macros
       final result = compileFileToLines(includedSource, includedSourceNode, _assemblerState);
 
       // Add the lines to the assembler state

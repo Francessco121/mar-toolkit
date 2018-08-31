@@ -4,6 +4,8 @@ The Macro MAR (MMAR) assembler language is a superset of [the game's MAR languag
 
 The documentation found here will only be about the extensions MMAR brings. It is assumed that users already know the basics of the [MAR language](https://github.com/simon987/Much-Assembly-Required/wiki). For a list of features MMAR currently does not support that MAR does, see [the list of compliance issues](https://github.com/Francessco121/HlmlToolkit/issues?q=is%3Aissue+is%3Aopen+label%3Amar-compliance).
 
+For information on how to use the MMAR assembler, [see the source docs](../../src/mmar_assembler).
+
 ## Features
 - [Assemble-Time Math](./assemble-time-math.md)
 - [File Modularity](./file-modularity.md)
