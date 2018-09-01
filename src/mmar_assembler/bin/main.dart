@@ -4,32 +4,25 @@ import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:args/args.dart';
-import 'package:mmar_assembler/mmar_assembler.dart';
+import 'package:mmar/mmar.dart';
+
+final _parser = ArgParser();
 
 Future<int> main(List<String> args) async {
   // Parse arguments
-  final parser = ArgParser();
-
-  void displayUsageError(String message) {
-    print(message);
-    print('');
-    print('mmar_assembler options:');
-    print(parser.usage);
-  }
-
-  parser.addOption('input',
+  _parser.addOption('input',
     abbr: 'i',
     help: 'A path to the Macro MAR file (.mmar) to be assembled.',
     valueHelp: 'FILE PATH'
   );
 
-  parser.addOption('output',
+  _parser.addOption('output',
     abbr: 'o',
     help: 'A path to write the assembled result to.',
     valueHelp: 'FILE PATH'
   );
 
-  parser.addOption('outtype',
+  _parser.addOption('outtype',
     abbr: 't',
     help: 'The output type.',
     allowed: [
@@ -46,9 +39,9 @@ Future<int> main(List<String> args) async {
   ArgResults results;
 
   try {
-    results = parser.parse(args);
+    results = _parser.parse(args);
   } on FormatException catch (ex) {
-    displayUsageError(ex.message);
+    _displayUsageError(ex.message);
     return 1;
   }
 
@@ -58,12 +51,12 @@ Future<int> main(List<String> args) async {
 
   // Validate arguments
   if (inputFilePath == null) {
-    displayUsageError("Option 'input' is required.");
+    _displayUsageError("Option 'input' is required.");
     return 1;
   }
 
   if (outputFilePath == null) {
-    displayUsageError("Option 'output' is required.");
+    _displayUsageError("Option 'output' is required.");
     return 1;
   }
 
@@ -83,9 +76,17 @@ Future<int> main(List<String> args) async {
 }
 
 Future<bool> _assembleFile(String inputFilePath, String outputFilePath, String outputType) async {
-  // Assemble the file
-  final assembler = new Assembler();
-  final AssembleResult result = assembler.assemble(inputFilePath, outputFilePath,
+  // Load the input source
+  Source entrySource;
+  try {
+    entrySource = await Source.createFromFile(inputFilePath);
+  } on io.FileSystemException catch (ex) {
+    print(ex);
+    return false;
+  }
+
+  /// Assemble the program
+  final AssembleResult result = assembleProgram(entrySource,
     outputType: outputType == 'binary' ? OutputType.binary : OutputType.text
   );
 
@@ -120,4 +121,11 @@ Future<bool> _assembleFile(String inputFilePath, String outputFilePath, String o
 
     return true;
   }
+}
+
+void _displayUsageError(String message) {
+  print(message);
+  print('');
+  print('mmar_assembler options:');
+  print(_parser.usage);
 }
