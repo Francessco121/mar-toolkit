@@ -9,14 +9,19 @@ The Macro MAR assembler.
 3. Run the assembler by doing `pub run bin/main.dart` from this directory.
     - Running `main.dart` without any arguments will display help information.
 
-### Assembling a file
+### Examples
 
-As an example, to assemble the file `main.mmar` into the file `main.out.mar`:
+#### Assembling a MMAR program
+To assemble the MMAR file `main.mmar` into the MAR source file `main.out.mar`:
 
 ```batch
 pub run bin/main.dart --input="main.mmar" --output="main.out.mar"
 ```
 
-#### Notes
-- This will also assemble any files included from `main.mmar`. Everything is assembled into the single output file.
-- Assembling to binary code is currently not supported, but is planned for the near future.
+**Note:** This will also assemble any files included from `main.mmar`. Everything is assembled into the single output file.
+
+#### Creating binary MAR code
+The assembler's output type is specified with the `outtype` argument (or `t` for short). The following will assemble `main.mmar` into the MAR binary file `main.bin`:
+```batch
+pub run bin/main.dart --input="main.mmar" --output="main.bin" --outtype="binary"
+```
