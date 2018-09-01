@@ -1,15 +1,21 @@
+import 'dart:collection';
 import 'dart:io' as io;
+import 'dart:typed_data';
 
 import 'compiling/ast_line_compiler.dart';
 import 'compiling/identifier_extractor.dart';
 import 'parsing/ast/ast.dart' as ast;
+import 'writing/binary_writer.dart';
 import 'writing/text_writer.dart';
 import 'assemble_error.dart';
 import 'assembler_state.dart';
+import 'output_type.dart';
 import 'source.dart';
 import 'utils.dart';
 
 class AssembleResult {
+  /// Will be of type [String] if the output type was text.
+  /// Will be of type [UnmodifiableListView<Uint8List>] if the output type was binary.
   final dynamic output;
   final List<AssembleError> errors;
 
@@ -17,7 +23,13 @@ class AssembleResult {
 }
 
 class Assembler {
-  AssembleResult assemble(String inputFilePath, String outputFilePath) {
+  AssembleResult assemble(String inputFilePath, String outputFilePath, {
+    OutputType outputType = OutputType.text
+  }) {
+    assert(inputFilePath != null);
+    assert(outputFilePath != null);
+    assert(outputType != null);
+
     // Open the file
     final inputFile = new io.File(inputFilePath);
     final String inputFileContents = inputFile.readAsStringSync();
@@ -44,11 +56,20 @@ class Assembler {
       // Don't output assembly if an assemble error occurred
       return AssembleResult(errors: aggregatedErrors);
     } else {
-      // Write the IR to a textual MAR form
-      final writer = new TextWriter();
-      final String compiledMarContents = writer.write(compileResult.lines);
+      if (outputType == OutputType.text) {
+        // Write the IR to a textual MAR form
+        final writer = new TextWriter();
+        final String compiledMarContents = writer.write(compileResult.lines);
 
-      return AssembleResult(output: compiledMarContents);
+        return AssembleResult(output: compiledMarContents);
+      } else if (outputType == OutputType.binary) {
+        // Write the IR to binary MAR form
+        final UnmodifiableListView<Uint8List> binary = writeBinary(compileResult.lines);
+
+        return AssembleResult(output: binary);
+      } else {
+        throw new ArgumentError.value(outputType, 'outputType');
+      }
     }
   }
 }

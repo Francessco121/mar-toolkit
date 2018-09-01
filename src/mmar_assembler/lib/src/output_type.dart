@@ -1,0 +1,4 @@
+enum OutputType {
+  text,
+  binary
+}

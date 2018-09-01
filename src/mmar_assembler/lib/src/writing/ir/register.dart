@@ -9,6 +9,20 @@ enum Register {
   sp
 }
 
+/// A map of registers to their bytecode index.
+/// 
+/// These indexes are used when encoding instruction selectors.
+const Map<Register, int> registerIndexes = {
+  Register.a: 1,
+  Register.b: 2,
+  Register.c: 3,
+  Register.d: 4,
+  Register.x: 5,
+  Register.y: 6,
+  Register.sp: 7,
+  Register.bp: 8
+};
+
 String registerToString(Register register) {
   switch (register) {
     case Register.a: return 'a';

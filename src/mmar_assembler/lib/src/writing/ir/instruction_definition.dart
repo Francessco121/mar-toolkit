@@ -7,12 +7,14 @@ import 'operand_type_flags.dart';
 class InstructionDefinition {
   final Mnemonic mnemonic;
   final String mnemonicText;
+  final int opcode;
   final InstructionOperandDefintion operand1;
   final InstructionOperandDefintion operand2;
 
   const InstructionDefinition({
     @required this.mnemonic,
     @required this.mnemonicText,
+    @required this.opcode,
     @required this.operand1,
     @required this.operand2
   });
