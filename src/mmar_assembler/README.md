@@ -25,3 +25,8 @@ The assembler's output type is specified with the `outtype` argument (or `t` for
 ```batch
 pub run bin/main.dart --input="main.mmar" --output="main.bin" --outtype="binary"
 ```
+
+## Testing
+Test MMAR programs should be created under the [test](./test) directory. Each subfolder represents a test case. Output files should use the file extensions `.out.mar` for text output and `.bin` for binary (as these are already ignored by git).
+
+Since this project is mainly for fun, MMAR tests do not have to be super comprehensive. Unit tests for the Dart code are also not currently necessary.

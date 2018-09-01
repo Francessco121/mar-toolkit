@@ -1,0 +1,8 @@
+#include "other.mmar"
+
+; test
+.text
+  #include "other_2.mmar"
+
+  mov A, 3 ; comment
+  brk
