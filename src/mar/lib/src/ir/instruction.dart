@@ -1,8 +1,8 @@
+import '../mnemonic.dart';
 import 'instruction_operand.dart';
 import 'labelable.dart';
 import 'line.dart';
 import 'line_visitor.dart';
-import 'mnemonic.dart';
 
 class Instruction implements Labelable, Line {
   @override

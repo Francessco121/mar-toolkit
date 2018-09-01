@@ -1,7 +1,9 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'ir/ir.dart';
+import '../ir/ir.dart';
+import '../instruction_definition.dart';
+import '../instructions.dart';
 
 /// Assembles a list of MAR source [lines] into binary data.
 /// 

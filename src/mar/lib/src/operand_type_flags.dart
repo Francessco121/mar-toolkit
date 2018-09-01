@@ -1,9 +1,4 @@
-import 'const_operand.dart';
-import 'immediate_operand.dart';
-import 'instruction_operand.dart';
-import 'label_operand.dart';
-import 'memory_instruction_operand.dart';
-import 'register_operand.dart';
+import 'ir/ir.dart';
 
 const int memoryOp = 0x0001;
 const int registerOp = 0x0010;

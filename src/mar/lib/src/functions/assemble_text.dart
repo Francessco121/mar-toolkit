@@ -1,6 +1,8 @@
 import 'package:charcode/charcode.dart';
 
-import 'ir/ir.dart';
+import '../ir/ir.dart';
+import '../mnemonic.dart';
+import '../register.dart';
 
 /// Assembles a list of MAR source [lines] into textual MAR source code.
 String assembleText(List<Line> lines) {
