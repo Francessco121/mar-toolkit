@@ -51,7 +51,7 @@ final List<InstructionDefinition> instructionDefinitions = [
   _define(Mnemonic.shr,   'shr',    0x07,   [memoryOp, registerOp],               [memoryOp, registerOp, immediateOp] ),
   _define(Mnemonic.sub,   'sub',    0x03,   [memoryOp, registerOp],               [memoryOp, registerOp, immediateOp] ),
   _define(Mnemonic.test,  'test',   0x0B,   [memoryOp, registerOp],               [memoryOp, registerOp, immediateOp] ),
-  _define(Mnemonic.xchg,  'xchg',   0x1F,   [memoryOp, registerOp],               [memoryOp, registerOp] ),
+  _define(Mnemonic.xchg,  'xchg',   0x1F,   [memoryOp, registerOp],               [memoryOp, registerOp]              ),
   _define(Mnemonic.xor,   'xor',    0x26,   [memoryOp, registerOp],               [memoryOp, registerOp, immediateOp] ),
 ];
 
