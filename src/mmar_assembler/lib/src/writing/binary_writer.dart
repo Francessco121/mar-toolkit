@@ -26,6 +26,11 @@ UnmodifiableListView<Uint8List> writeBinary(List<ir.Line> lines, {int chunkSize 
       labelAddress = -labelAddress;
     }
 
+    if (visitor.addressOffset != null) {
+      // Offset the address by the ORG value
+      labelAddress += visitor.addressOffset;
+    }
+
     // Overwrite the placeholder with the correct address
     final Uint8List chunk = visitor.chunks[(reference.address / chunkSize).floor()];
     chunk[reference.address % chunkSize] = labelAddress;
