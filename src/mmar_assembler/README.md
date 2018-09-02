@@ -4,26 +4,48 @@ The Macro MAR assembler.
 
 ## Usage
 
-1. Install [the Dart SDK](https://www.dartlang.org/tools/sdk) (minimum version is 2.0.0).
-2. Run `pub get` in this directory to pull down dependencies.
-3. Run the assembler by doing `pub run bin/main.dart` from this directory.
-    - Running `main.dart` without any arguments will display help information.
+The only prerequisite is [the Dart SDK](https://www.dartlang.org/tools/sdk) (version 2.0.0 or higher).
+
+### Pub activation
+
+This is the recommended option if you intend on just using the application, or would like to run a development copy from any directory.
+
+1. Run `pub global activate --source path <path to this folder>`.
+2. Run the assembler by doing `mmar_assembler <args>`.
+    - If this doesn't work, see [the Dart docs for pub global](https://www.dartlang.org/tools/pub/cmd/pub-global#running-a-script). You might not have the pub `bin` folder in your path.
+
+### Without pub activation
+
+1. Run `pub get` in this directory to pull down dependencies.
+2. Run the assembler by doing `pub run bin/mmar_assembler.dart` from this directory.
 
 ### Examples
+
+#### Listing help information
+Running the assembler with the command `help` will display help info:
+
+```bat
+mmar_assembler help
+```
 
 #### Assembling a MMAR program
 To assemble the MMAR file `main.mmar` into the MAR source file `main.out.mar`:
 
-```batch
-pub run bin/main.dart --input="main.mmar" --output="main.out.mar"
+```bat
+mmar_assembler --input=main.mmar --output=main.out.mar
+```
+
+Alternatively:
+```bat
+mmar_assembler -i main.mmar -o main.out.mar
 ```
 
 **Note:** This will also assemble any files included from `main.mmar`. Everything is assembled into the single output file.
 
 #### Creating binary MAR code
 The assembler's output type is specified with the `outtype` argument (or `t` for short). The following will assemble `main.mmar` into the MAR binary file `main.bin`:
-```batch
-pub run bin/main.dart --input="main.mmar" --output="main.bin" --outtype="binary"
+```bat
+mmar_assembler --input=main.mmar --output=main.bin --outtype=binary
 ```
 
 ## Testing

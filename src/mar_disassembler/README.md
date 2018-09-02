@@ -4,16 +4,38 @@ A disassembler for binary MAR code.
 
 ## Usage
 
-1. Install [the Dart SDK](https://www.dartlang.org/tools/sdk) (minimum version is 2.0.0).
-2. Run `pub get` in this directory to pull down dependencies.
-3. Run the disassembler by doing `pub run bin/main.dart` from this directory.
-    - Running `main.dart` without any arguments will display help information.
+### Pub activation
 
-### Example
+This is the recommended option if you intend on just using the application, or would like to run a development copy from any directory.
+
+1. Run `pub global activate --source path <path to this folder>`.
+2. Run the disassembler by doing `mar_disassembler <args>`.
+    - If this doesn't work, see [the Dart docs for pub global](https://www.dartlang.org/tools/pub/cmd/pub-global#running-a-script). You might not have the pub `bin` folder in your path.
+
+### Without pub activation
+
+1. Run `pub get` in this directory to pull down dependencies.
+2. Run the disassembler by doing `pub run bin/mar_disassembler.dart` from this directory.
+
+### Examples
+
+#### Listing help information
+Running the disassembler with the command `help` will display help info:
+
+```bat
+mar_disassembler help
+```
+
+#### Disassembling a binary
 To disassemble the MAR binary file `program.bin` into the MAR source file `program.out.mar`:
 
-```batch
-pub run bin/main.dart --input="program.bin" --output="program.out.mar"
+```bat
+mar_disassembler --input=program.bin --output=program.out.mar
+```
+
+Alternatively:
+```bat
+mar_disassembler -i program.bin -o program.out.mar
 ```
 
 ## Testing

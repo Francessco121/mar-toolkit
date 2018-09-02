@@ -6,6 +6,9 @@ publish_to: none
 environment:
   sdk: '>=2.0.0 <3.0.0'
 
+executables:
+  mar_disassembler:
+
 dependencies:
   args: ^1.5.0
   charcode: ^1.1.2

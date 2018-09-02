@@ -21,6 +21,8 @@ Future<int> main(List<String> args) async {
     valueHelp: 'FILE PATH'
   );
 
+  _parser.addCommand('help');
+
   ArgResults results;
 
   try {
@@ -28,6 +30,12 @@ Future<int> main(List<String> args) async {
   } on FormatException catch (ex) {
     _displayUsageError(ex.message);
     return 1;
+  }
+
+  if (results.command?.name == 'help') {
+    print('mmar_assembler options:');
+    print(_parser.usage);
+    return 0;
   }
 
   final String inputFilePath = results['input'];
