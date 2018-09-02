@@ -23,6 +23,19 @@ const Map<Register, int> registerIndexes = {
   Register.bp: 8
 };
 
+/// A map of register byte code indexes to their respected
+/// enum value.
+const Map<int, Register> indexesToRegisters = {
+  1: Register.a,
+  2: Register.b,
+  3: Register.c,
+  4: Register.d,
+  5: Register.x,
+  6: Register.y,
+  7: Register.sp,
+  8: Register.bp
+};
+
 String registerToString(Register register) {
   switch (register) {
     case Register.a: return 'a';

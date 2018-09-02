@@ -101,21 +101,21 @@ class _BinaryReader {
       _buffer.write(_integerAsString(operandWord));
       _buffer.write(']');
     } else if (type == SelectorType.register16) {
-      final int enumIndex = rawSelector - 1;
+      final int registerIndex = rawSelector;
 
-      _buffer.write(_registerEnumIndexToString(enumIndex));
+      _buffer.write(_registerIndexToString(registerIndex));
     } else if (type == SelectorType.memoryRegister16) {
-      final int enumIndex = (rawSelector - 0x8) - 1;
+      final int registerIndex = rawSelector - 0x8;
 
       _buffer.write('[');
-      _buffer.write(_registerEnumIndexToString(enumIndex));
+      _buffer.write(_registerIndexToString(registerIndex));
       _buffer.write(']');
     } else if (type == SelectorType.memoryRegisterDisplaced16) {
       final int operandWord = _advance();
-      final int enumIndex = (rawSelector - 0x8) - 1;
+      final int registerIndex = rawSelector - 0x10;
 
       _buffer.write('[');
-      _buffer.write(_registerEnumIndexToString(enumIndex));
+      _buffer.write(_registerIndexToString(registerIndex));
       _buffer.write(' + ');
       _buffer.write(_integerAsString(operandWord));
       _buffer.write(']');
@@ -124,12 +124,11 @@ class _BinaryReader {
     }
   }
 
-  String _registerEnumIndexToString(int enumIndex) {
-    if (enumIndex >= 0 && enumIndex < Register.values.length) {
-      final Register register = Register.values[enumIndex];
-      final String registerText = registerToString(register);
+  String _registerIndexToString(int registerIndex) {
+    final Register register = indexesToRegisters[registerIndex];
 
-      return registerText.toUpperCase();
+    if (register != null) {
+      return (registerToString(register)).toUpperCase();
     } else {
       return 'R?';
     }
@@ -158,7 +157,7 @@ class _BinaryReader {
       final int regDispOffset = selector - 0x10;
 
       if (regDispOffset >= 0x1 && regDispOffset <= 0x8) {
-        return SelectorType.memoryRegister16;
+        return SelectorType.memoryRegisterDisplaced16;
       }
     }
 
@@ -176,10 +175,6 @@ class _BinaryReader {
     _current = _readWord();
 
     return word;
-  }
-
-  int _peek() {
-    return _current;
   }
 
   int _readWord() {

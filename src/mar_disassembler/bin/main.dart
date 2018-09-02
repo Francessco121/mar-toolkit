@@ -3,7 +3,6 @@ import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:args/args.dart';
-import 'package:mar/mar.dart';
 import 'package:mar_disassembler/disassemble_binary.dart';
 
 final _parser = ArgParser();

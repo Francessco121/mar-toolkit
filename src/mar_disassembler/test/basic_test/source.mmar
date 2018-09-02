@@ -1,0 +1,10 @@
+.text
+  mov A, 20
+  mov B, [0x1000]
+label:
+  mov C, [label]
+  mov D, [C]
+  mov X, [X + label]
+  mov Y, [Y - label]
+  mov BP, SP
+  brk
