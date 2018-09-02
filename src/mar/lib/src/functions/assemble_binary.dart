@@ -221,15 +221,27 @@ class _LineVisitor implements LineVisitor {
   void _writeDisplacement(Displacement displacement) {
     final DisplacementOperand operand = displacement.value;
 
+    int value = 0;
     if (operand is ImmediateOperand) {
-      _write(operand.value);
+      value = operand.value;
     } else if (operand is LabelOperand) {
       _writeLabelOperand(operand,
         negate: displacement.$operator == DisplacementOperator.minus
       );
+
+      return;
     } else if (operand is ConstOperand) {
-      _write(_constants[operand.constIdentifier]);
+      value = _constants[operand.constIdentifier];
+    } else {
+      // Should never happen
+      throw new ArgumentError.value(displacement, 'displacement');
     }
+
+    _write(
+      displacement.$operator == DisplacementOperator.minus
+        ? -value
+        : value
+    );
   }
 
   void _writeMemoryOperand(MemoryInstructionOperand operand) {
