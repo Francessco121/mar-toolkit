@@ -112,6 +112,7 @@ class _TextWriterLineVisitor implements LineVisitor {
 
     _buffer.write(label.label);
     _buffer.write(':');
+    _writeCommentIfExists(label);
     _buffer.writeln();
   }
 
