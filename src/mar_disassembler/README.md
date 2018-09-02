@@ -4,6 +4,8 @@ A disassembler for binary MAR code.
 
 ## Usage
 
+The only prerequisite is [the Dart SDK](https://www.dartlang.org/tools/sdk) (version 2.0.0 or higher).
+
 ### Pub activation
 
 This is the recommended option if you intend on just using the application, or would like to run a development copy from any directory.
