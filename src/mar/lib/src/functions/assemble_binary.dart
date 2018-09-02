@@ -44,7 +44,10 @@ UnmodifiableListView<Uint8List> assembleBinary(List<Line> lines, {int chunkSize 
 
     // Overwrite the placeholder with the correct address
     final Uint8List chunk = visitor.chunks[(reference.address / chunkSize).floor()];
-    chunk[reference.address % chunkSize] = labelAddress;
+    final referenceAddress = reference.address % chunkSize;
+
+    chunk[referenceAddress] = labelAddress >> 8;
+    chunk[referenceAddress + 1] = labelAddress;
   }
 
   // Replace the last chunk with a view if it is smaller than the chunk size
@@ -89,9 +92,9 @@ class _LineVisitor implements LineVisitor {
   /// The global address offset to use when resolving label references.
   /// 
   /// Will be `null` if no `ORG` directive was visited.
-  int get  addressOffset => _addressOffset;
+  int get addressOffset => _addressOffset;
 
-  int get _currentAddress => chunks.length;
+  int get _currentAddress => _currentChunkIndex * chunks.length;
 
   int _addressOffset = null;
   int _currentChunkIndex = 0;
@@ -207,12 +210,13 @@ class _LineVisitor implements LineVisitor {
     // that is meant to be written.
   }
 
-  void _writeLabelOperand(LabelOperand operand, {bool negate}) {
+  void _writeLabelOperand(LabelOperand operand, {bool negate = false}) {
     // We don't necessarily know the address of the label yet,
     // so add a placeholder word and mark it as unresolved.
     unresolvedReferences.add(_UnresolvedLabelReference(
       _currentAddress,
-      operand.labelIdentifier
+      operand.labelIdentifier,
+      negate: negate
     ));
 
     _write(0);
@@ -292,7 +296,7 @@ class _LineVisitor implements LineVisitor {
 
   /// Marks the given [label] as being at the current address.
   void _markLabelAsCurrent(String label) {
-    labels[label] = _currentAddress;
+    labels[label] = _currentAddress ~/ 2;
   }
 
   int _getOperandSelector(InstructionOperand operand) {
