@@ -60,6 +60,9 @@ class _BinaryReader {
     // Get the instruction definition
     final InstructionDefinition instructionDef = opcodesToInstructionDefs[opcode];
 
+    _buffer.write(_integerAsString((_position ~/ 2) - 2));
+    _buffer.write(':    ');
+
     // Write the mnemonic
     if (instructionDef != null) {
       _buffer.write(instructionDef.mnemonicText);
@@ -165,9 +168,21 @@ class _BinaryReader {
   }
 
   String _integerAsString(int value) {
-    // AND with 0xFFFF to cut-off bits above 16-bits.
-    // Effectively 'wraps' the value.
-    return '0x' + (value & 0xFFFF).toRadixString(16);
+    final String string = value.toRadixString(16);
+
+    if (string.length < 4) {
+      final buffer = new StringBuffer('0x');
+
+      for (int i = string.length; i < 4; i++) {
+        buffer.write('0');
+      }
+
+      buffer.write(string);
+
+      return buffer.toString();
+    } else {
+      return '0x$string';
+    }
   }
 
   int _advance() {
