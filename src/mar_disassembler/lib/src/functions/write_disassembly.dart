@@ -101,7 +101,7 @@ class _LineVisitor implements DisassembledContentVisitor {
 
   @override
   void visitInstruction(DisassembledInstruction instruction) {
-    _buffer.write(mnemonicToString(instruction.mnemonic).toUpperCase());
+    _buffer.write(mnemonicToString(instruction.mnemonic));
 
     if (instruction.operand1 != null) {
       _buffer.write(' ');

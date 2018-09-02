@@ -1,0 +1,13 @@
+.text
+
+_loop:
+  cmp A, 10
+  jz _done
+  jnz _increment
+
+_increment:
+  inc A
+  jmp _loop
+
+_done:
+  brk
