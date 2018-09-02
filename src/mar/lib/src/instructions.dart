@@ -58,11 +58,24 @@ final List<InstructionDefinition> instructionDefinitions = [
 /// A map of [Mnemonic] enum values to their respected [InstructionDefinition].
 final Map<Mnemonic, InstructionDefinition> mnemonicsToInstructionDefs = _createMnemonicMap();
 
+/// A map of opcodes to their respected [InstructionDefinition].
+final Map<int, InstructionDefinition> opcodesToInstructionDefs = _createOpcodeMap();
+
 Map<Mnemonic, InstructionDefinition> _createMnemonicMap() {
   final Map<Mnemonic, InstructionDefinition> map = {};
 
   for (InstructionDefinition def in instructionDefinitions) {
     map[def.mnemonic] = def;
+  }
+
+  return map;
+}
+
+Map<int, InstructionDefinition> _createOpcodeMap() {
+  final Map<int, InstructionDefinition> map = {};
+
+  for (InstructionDefinition def in instructionDefinitions) {
+    map[def.opcode] = def;
   }
 
   return map;

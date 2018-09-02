@@ -1,0 +1,8 @@
+ORG 0
+
+.text
+  mov A, 3
+  mov X, 0
+  mov Y, 0
+  hwi 0xB
+  brk
