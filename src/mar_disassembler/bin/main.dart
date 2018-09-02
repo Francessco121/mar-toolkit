@@ -88,7 +88,7 @@ Future<bool> _disassembleFile(String inputFilePath, String outputFilePath) async
   }
 
   // Disassemble the file
-  final String disassembledMarSource = disassembleBinary(data);
+  final String disassembledMarSource = disassembleBinary(inputFile.uri, data);
 
   // Output the results
   final outputFile = new io.File(outputFilePath);

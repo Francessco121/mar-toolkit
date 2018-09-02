@@ -1,0 +1,6 @@
+.text
+  brk
+
+.data
+  DW 0x1234, 0x4321
+  DW "test", 0x0
