@@ -22,14 +22,14 @@ Future<int> main(List<String> args) async {
     valueHelp: 'FILE PATH'
   );
 
-  _parser.addOption('startoffset',
+  _parser.addOption('start-offset',
     help: 
       'The byte offset to start reading from in the input file. '
       'If not specified, will read from the beginning of the file.',
     valueHelp: 'INTEGER'
   );
 
-  _parser.addOption('endoffset',
+  _parser.addOption('end-offset',
     help: 
       'The byte offset to stop reading at in the input file (exclusive). '
       'If not specified, will read to the of the file.',
@@ -54,8 +54,8 @@ Future<int> main(List<String> args) async {
 
   final String inputFilePath = results['input'];
   final String outputFilePath = results['output'];
-  final String startOffsetString = results['startoffset'];
-  final String endOffsetString = results['endoffset'];
+  final String startOffsetString = results['start-offset'];
+  final String endOffsetString = results['end-offset'];
 
   final int startOffset = startOffsetString == null ? null : int.tryParse(startOffsetString);
   final int endOffset = endOffsetString == null ? null : int.tryParse(endOffsetString);
@@ -72,17 +72,17 @@ Future<int> main(List<String> args) async {
   }
 
   if (startOffsetString != null && startOffset == null) {
-    _displayUsageError("Option 'startoffset' must be a valid integer.");
+    _displayUsageError("Option 'start-offset' must be a valid integer.");
     return 1;
   }
 
   if (endOffsetString != null && endOffset == null) {
-    _displayUsageError("Option 'endoffset' must be a valid integer.");
+    _displayUsageError("Option 'end-offset' must be a valid integer.");
     return 1;
   }
 
   if (startOffset != null && endOffset != null && endOffset < startOffset) {
-    _displayUsageError("Option 'endoffset' cannot be less than the 'startoffset' option.");
+    _displayUsageError("Option 'end-offset' cannot be less than the 'start-offset' option.");
     return 1;
   }
 
