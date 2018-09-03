@@ -7,6 +7,7 @@ MMAR allows users to split code up into multiple files through the use of `#incl
 ## Contents
 - [\#include](#include)
 - [\#once](#once)
+- [Sections and includes](#sections-and-includes)
 
 ## \#include
 
@@ -108,4 +109,72 @@ other_function:
   push LIB_CONSTANT
   call some_function
   ret
+```
+
+## Sections and includes
+
+Any MMAR file can contain any number of `.text` and `.data` section lines. This allows sections to be used in a multi-file program, where any file can contribute to either section.
+
+### The default section
+By default for each file, MMAR adds code to the `.text` section. For example, the following file:
+
+```asm
+mov A, B
+```
+
+Would result in:
+
+```asm
+.text
+  mov A, B
+```
+
+### How includes effect sections
+
+The current section being contributed to is noted per-file, which means that including a file will never change the section of the file with the `#include`.
+
+For example, the following files:
+
+**file_1.mmar**
+```asm
+.data
+  #include "file_2.mmar"
+  DW "file_1"
+
+.text
+  ; file_1
+  brk
+```
+
+**file_2.mmar**
+```asm
+.data
+  #include "file_3.mmar"
+  DW "file_2"
+
+.text
+  ; file_2
+  mov A, B
+```
+
+**file_3.mmar**
+```asm
+; file_3
+mov X, Y
+```
+
+Would result in the following MAR source:
+
+```asm
+.text
+  ; file_3
+  mov X, Y
+  ; file_2
+  mov A, B
+  ; file_1
+  brk
+
+.data
+  DW "file_2"
+  DW "file_1"
 ```
