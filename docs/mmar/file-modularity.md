@@ -129,7 +129,7 @@ Would result in:
   mov A, B
 ```
 
-### How includes effect sections
+### How includes affect sections
 
 The current section being contributed to is noted per-file, which means that including a file will never change the section of the file with the `#include`.
 
