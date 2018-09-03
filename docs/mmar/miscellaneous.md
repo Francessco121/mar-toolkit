@@ -5,7 +5,7 @@
 This page documents a list of MMAR features that aren't involved enough to warrant a dedicated page and don't fit in with any existing pages.
 
 ## Contents
-- [Additional string escape sequences](./additional-string-escape-sequences)
+- [Additional string escape sequences](#additional-string-escape-sequences)
 
 ## Additional string escape sequences
 

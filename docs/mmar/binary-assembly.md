@@ -6,7 +6,7 @@ The MMAR assembler supports assembling MMAR and MAR code into binary form. [See 
 
 ## Contents
 
-- [ORG directive differences](./org-directive-differences)
+- [ORG directive differences](#org-directive-differences)
 
 ## ORG directive differences
 
