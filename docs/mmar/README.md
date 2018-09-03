@@ -11,6 +11,7 @@ For information on how to use the MMAR assembler, [see the source docs](../../sr
 - [Binary Assembly](./binary-assembly.md)
 - [File Modularity](./file-modularity.md)
 - [Integer Literal Extras](./integer-literal-extras.md)
+- [Miscellaneous](./miscellaneous.md)
 
 ## Technical Documents
 - [Language Grammar](./grammar.md)
