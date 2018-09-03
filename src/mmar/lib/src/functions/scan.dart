@@ -201,18 +201,50 @@ class _Scanner {
     _currentColumn++;
 
     // Read until end of string or EOF
+    final literalBuffer = new StringBuffer();
+    final unicodeBuffer = new StringBuffer();
+    bool readingUnicodeEscape = false;
     bool justEscaped = false;
-    int _lastChar;
+    int lastChar;
+
     while (!_isAtEnd()) {
-      // Deal with escaped double quotes
-      if (!justEscaped && _lastChar == $backslash) {
+      if (!justEscaped && lastChar == $backslash) {
+        // Don't let double-quotes terminate the string for this iteration
         justEscaped = true;
       } else if (_peek() == $quote) {
+        // String ended with a double-quote without a backslash prior
+
+        if (readingUnicodeEscape) {
+          final int lexemeIndex = _currentOffset - _startOffset;
+
+          _addError('Unicode string escape sequence must contain 4 digits.', 
+            span: SourceSpan(
+              SourceLocation(
+                _currentOffset - unicodeBuffer.length - 2,
+                column: _currentColumn - unicodeBuffer.length - 2,
+                line: _currentLine,
+                sourceUrl: _scanner.sourceUrl
+              ),
+              SourceLocation(
+                _currentOffset,
+                column: _currentColumn,
+                line: _currentLine,
+                sourceUrl: _scanner.sourceUrl
+              ),
+              _lexemeBuffer
+                .toString()
+                .substring(lexemeIndex - unicodeBuffer.length - 2, lexemeIndex)
+            )
+          );
+        }
+
         break;
       } else {
+        // Allow backslashes to escape double-quotes next iteration
         justEscaped = false;
       }
 
+      // Update source offsets
       _currentOffset++;
 
       if (_peek() == $lf) {
@@ -222,7 +254,120 @@ class _Scanner {
         _currentColumn++;
       }
 
-      _lastChar = _advance();
+      // Read the next char
+      final int char = _advance();
+
+      // Handle escape sequences
+      if (readingUnicodeEscape) {
+        if (_isBase16Digit(char)) {
+          // Valid hex digit
+          unicodeBuffer.writeCharCode(char);
+
+          if (unicodeBuffer.length >= 4) {
+            // Done reading unicode escape sequence
+            final unicodeChar = int.parse(unicodeBuffer.toString(), radix: 16);
+            literalBuffer.writeCharCode(unicodeChar);
+
+            readingUnicodeEscape = false;
+            unicodeBuffer.clear();
+          }
+        } else {
+          // Invalid hex digit
+          readingUnicodeEscape = false;
+          unicodeBuffer.clear();
+
+          final int lexemeIndex = _currentOffset - _startOffset;
+
+          _addError('Invalid hexadecimal digit in unicode string escape sequence.', 
+            span: SourceSpan(
+              SourceLocation(
+                _currentOffset - 1,
+                column: _currentColumn - 1,
+                line: _currentLine,
+                sourceUrl: _scanner.sourceUrl
+              ),
+              SourceLocation(
+                _currentOffset,
+                column: _currentColumn,
+                line: _currentLine,
+                sourceUrl: _scanner.sourceUrl
+              ),
+              _lexemeBuffer
+                .toString()
+                .substring(lexemeIndex - 1, lexemeIndex)
+            )
+          );
+        }
+      } else if (justEscaped) {
+        switch (char) {
+          // \\
+          case $backslash:
+            literalBuffer.writeCharCode($backslash);
+            break;
+          // \"
+          case $quote:
+            literalBuffer.writeCharCode($quote);
+            break;
+          // \b
+          case $b:
+            literalBuffer.writeCharCode($bs);
+            break;
+          // \n
+          case $n:
+            literalBuffer.writeCharCode($lf);
+            break;
+          // \r
+          case $r:
+            literalBuffer.writeCharCode($cr);
+            break;
+          // \t
+          case $t:
+            literalBuffer.writeCharCode($tab);
+            break;
+          // \f
+          case $f:
+            literalBuffer.writeCharCode($ff);
+            break;
+          // \0
+          case $0:
+            literalBuffer.writeCharCode($nul);
+            break;
+          // \u
+          case $u:
+            // Start reading unicode escape sequence
+            readingUnicodeEscape = true;
+            break;
+          default:
+            final int lexemeIndex = _currentOffset - _startOffset;
+
+            _addError('Unexpected escape sequence.', 
+              span: SourceSpan(
+                SourceLocation(
+                  _currentOffset - 1,
+                  column: _currentColumn - 1,
+                  line: _currentLine,
+                  sourceUrl: _scanner.sourceUrl
+                ),
+                SourceLocation(
+                  _currentOffset + 1,
+                  column: _currentColumn + 1,
+                  line: _currentLine,
+                  sourceUrl: _scanner.sourceUrl
+                ),
+                _lexemeBuffer
+                  .toString()
+                  .substring(lexemeIndex - 1, lexemeIndex + 1)
+              )
+            );
+
+            break;
+        }
+      } else if (char != $backslash) {
+        literalBuffer.writeCharCode(char);
+      }
+
+      // Save the last char so we can handle escape sequences
+      lastChar = char;
     }
 
     // Check if it's an unterminated string
@@ -239,8 +384,8 @@ class _Scanner {
     // Build the lexeme
     final String lexeme = _lexemeBuffer.toString();
 
-    // Convert the lexeme to a string literal (removes quotes and handles escape codes)
-    final String literal = _stringLexemeToLiteral(lexeme);
+    // Build the literal
+    final String literal = literalBuffer.toString();
     
     // Create start and end source locations
     final SourceSpan span = _createSourceSpanForCurrent(lexeme);
@@ -251,103 +396,6 @@ class _Scanner {
       literal: literal,
       sourceSpan: span
     ));
-  }
-
-  String _stringLexemeToLiteral(String lexeme) {
-    // Track our own temporary character positions so we can
-    // create source spans for escape sequences
-    int currentOffset = _startOffset;
-    int currentColumn = _currentColumn;
-    int currentLine = _currentLine;
-
-    // Trim surrounding quotes and handle escape characters
-    final StringBuffer buffer = new StringBuffer();
-
-    int prevChar = null;
-    bool justEscaped = false;
-
-    for (int i = 1; i < lexeme.length - 1; i++) {
-      final int char = lexeme.codeUnitAt(i);
-
-      if (char == $lf) {
-        currentColumn = 0;
-        currentLine++;
-      } else {
-        currentOffset++;
-        currentColumn++;
-      }
-
-      currentOffset++;
-
-      if (!justEscaped && prevChar == $backslash) {
-        switch (char) {
-          // \\
-          case $backslash:
-            buffer.writeCharCode($backslash);
-            break;
-          // \"
-          case $quote:
-            buffer.writeCharCode($quote);
-            break;
-          // \b
-          case $b:
-            buffer.writeCharCode($bs);
-            break;
-          // \n
-          case $n:
-            buffer.writeCharCode($lf);
-            break;
-          // \r
-          case $r:
-            buffer.writeCharCode($cr);
-            break;
-          // \t
-          case $t:
-            buffer.writeCharCode($tab);
-            break;
-          // \f
-          case $f:
-            buffer.writeCharCode($ff);
-            break;
-          // \0
-          case $0:
-            buffer.writeCharCode($nul);
-            break;
-          default:
-            _addError('Unexpected escape sequence.', 
-              span: SourceSpan(
-                SourceLocation(
-                  currentOffset - 1,
-                  column: currentColumn - 1,
-                  line: currentLine,
-                  sourceUrl: _scanner.sourceUrl
-                ),
-                SourceLocation(
-                  currentOffset + 1,
-                  column: currentColumn + 1,
-                  line: currentLine,
-                  sourceUrl: _scanner.sourceUrl
-                ),
-                lexeme.substring(i - 1, i + 1)
-              )
-            );
-            break;
-        }
-
-        justEscaped = true;
-      } else {
-        if (char != $backslash) {
-          buffer.writeCharCode(char);
-        }
-
-        justEscaped = false;
-      }
-
-      prevChar = char;
-    }
-
-    // Build the literal value
-    return buffer.toString();
   }
 
   void _integer(int firstChar) {
