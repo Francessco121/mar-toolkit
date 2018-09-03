@@ -24,5 +24,7 @@ export 'memory_value.dart';
 export 'once_macro.dart';
 export 'org_directive.dart';
 export 'section.dart';
+export 'source_end_marker.dart';
+export 'source_start_marker.dart';
 export 'statement.dart';
 export 'string_literal.dart';

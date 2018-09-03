@@ -5,6 +5,8 @@ import 'instruction.dart';
 import 'label_line.dart';
 import 'org_directive.dart';
 import 'section.dart';
+import 'source_end_marker.dart';
+import 'source_start_marker.dart';
 
 abstract class LineVisitor {
   void visitComment(Comment comment);
@@ -14,4 +16,6 @@ abstract class LineVisitor {
   void visitLabelLine(LabelLine labelLine);
   void visitOrgDirective(OrgDirective orgDirective);
   void visitSection(Section section);
+  void visitSourceEndMarker(SourceEndMarker marker);
+  void visitSourceStartMarker(SourceStartMarker marker);
 }

@@ -51,7 +51,7 @@ class _LineVisitor implements LineVisitor {
     : assert(_identifiers != null);
 
   @override
-  void visitComment(Comment comment) { }
+  void visitComment(_) { }
 
   @override
   void visitConstant(Constant constant) {
@@ -85,10 +85,16 @@ class _LineVisitor implements LineVisitor {
   }
 
   @override
-  void visitOrgDirective(OrgDirective orgDirective) { }
+  void visitOrgDirective(_) { }
 
   @override
-  void visitSection(Section section) { }
+  void visitSection(_) { }
+
+  @override
+  void visitSourceEndMarker(_) { }
+
+  @override
+  void visitSourceStartMarker(_) { }
 
   void _visitLabel(Label label) {
     final String identifier = label.identifier.lexeme;

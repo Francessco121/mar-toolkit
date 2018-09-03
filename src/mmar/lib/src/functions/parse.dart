@@ -41,6 +41,9 @@ class _Parser {
   ParseResult parse() {
     final List<Statement> statements = [];
 
+    // Add a start of source marker
+    statements.add(const SourceStartMarker());
+
     // Parse until EOF
     while (!_isAtEnd()) {
       // Parse statement
@@ -65,6 +68,9 @@ class _Parser {
         }
       }
     }
+
+    // Add a end of source marker
+    statements.add(const SourceEndMarker());
 
     // Parse complete!
     return ParseResult(

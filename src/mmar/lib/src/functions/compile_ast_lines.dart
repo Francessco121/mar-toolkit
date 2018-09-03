@@ -92,6 +92,9 @@ class _AstLineVisitor implements LineVisitor, ConstExpressionVisitor {
   List<mar.Line> _currentSectionLines;
 
   final Map<String, int> _compiledConstants = {};
+  
+  /// A stack representing the last section being read per source
+  final _sectionStack = new ListQueue<String>();
 
   final Identifiers _identifiers;
 
@@ -227,6 +230,24 @@ class _AstLineVisitor implements LineVisitor, ConstExpressionVisitor {
     if (comment != null) {
       _addLine(mar.Comment(comment));
     }
+  }
+
+  @override
+  void visitSourceStartMarker(_) {
+    // Push the current section
+    _sectionStack.addFirst(_currentSection);
+
+    // Switch to text
+    _switchSection('text');
+  }
+
+  @override
+  void visitSourceEndMarker(_) {
+    // Pop the previous section
+    final String section = _sectionStack.removeFirst();
+
+    // Switch to the previous section
+    _switchSection(section);
   }
 
   @override
