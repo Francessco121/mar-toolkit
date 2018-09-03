@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:mar/mar.dart';
 
 import '../disassembly/disassembly.dart';
@@ -18,6 +20,7 @@ class _Reinterpreter {
     : assert(_lines != null);
 
   void reinterpret() {
+    // Pass #1: Annotate references with labels
     for (_i = 0; _i < _lines.length; _i++) {
       // Label jumps
       _tryLabelJump();
@@ -25,6 +28,31 @@ class _Reinterpreter {
       // Label memory references
       _tryLabelOperandMemory(1);
       _tryLabelOperandMemory(2);
+    }
+
+    // Pass #2: Re-interpret data as DW directives
+    //
+    // 99% of the time, words after a line that was labled
+    // as data is actually data. A lot of this gets mistaken
+    // for valid instructions however, so we overwrite them here.
+    bool replacing = false;
+
+    for (_i = 0; _i < _lines.length; _i++) {
+      final DisassemblyLine line = _lines[_i];
+      final DisassembledContent content = line.content;
+
+      if (content is DisassembledLabel) {
+        if (content.label.startsWith('data_')) {
+          replacing = true;
+        } else {
+          // Replace up to the next non-data label
+          replacing = false;
+        }
+      }
+
+      if (replacing) {
+        _reinterpretAsDw();
+      }
     }
   }
 
@@ -160,6 +188,40 @@ class _Reinterpreter {
       // Insert a label at the target
       _insertLabel(label, addressIndex);
     }
+  }
+
+  void _reinterpretAsDw() {
+    final DisassemblyLine line = _lines[_i];
+
+    // Ensure line is an instruction
+    if (line.content is! DisassembledInstruction) {
+      return;
+    }
+
+    // Remove the line
+    _lines.removeAt(_i);
+
+    // Replace it with 1 DW directive per word
+    final int words = line.rawBytes.length ~/ 2;
+
+    for (int i = 0; i < words; i++) {
+      final int upper = line.rawBytes[i * 2];
+      final int lower = line.rawBytes[(i * 2) + 1];
+
+      final int word = lower | (upper << 8);
+
+      _lines.insert(_i, DisassemblyLine(
+        line.address + i,
+        DisassembledDwDirective([DwOperand(word)]),
+        Uint8List.view(
+          line.rawBytes.buffer, 
+          line.rawBytes.offsetInBytes + (i * 2), 
+          2
+        )
+      ));
+    }
+
+    _i += (words - 1);
   }
 
   void _insertLabel(String label, int atAddress) {
