@@ -48,8 +48,7 @@ Future<int> main(List<String> args) async {
   }
 
   if (results.command?.name == 'help') {
-    print('mmar_assembler options:');
-    print(_parser.usage);
+    _displayUsage();
     return 0;
   }
 
@@ -134,6 +133,10 @@ Future<bool> _assembleFile(String inputFilePath, String outputFilePath, String o
 void _displayUsageError(String message) {
   print(message);
   print('');
+  _displayUsage();
+}
+
+void _displayUsage() {
   print('mmar_assembler options:');
   print(_parser.usage);
 }
