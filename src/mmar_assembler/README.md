@@ -43,9 +43,9 @@ mmar_assembler -i main.mmar -o main.out.mar
 **Note:** This will also assemble any files included from `main.mmar`. Everything is assembled into the single output file.
 
 #### Creating binary MAR code
-The assembler's output type is specified with the `outtype` argument (or `t` for short). The following will assemble `main.mmar` into the MAR binary file `main.bin`:
+The assembler's output type is specified with the `output-type` argument (or `t` for short). The following will assemble `main.mmar` into the MAR binary file `main.bin`:
 ```bat
-mmar_assembler --input=main.mmar --output=main.bin --outtype=binary
+mmar_assembler --input=main.mmar --output=main.bin --output-type=binary
 ```
 
 ## Testing

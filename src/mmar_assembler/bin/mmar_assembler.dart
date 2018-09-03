@@ -22,7 +22,7 @@ Future<int> main(List<String> args) async {
     valueHelp: 'FILE PATH'
   );
 
-  _parser.addOption('outtype',
+  _parser.addOption('output-type',
     abbr: 't',
     help: 'The output type.',
     allowed: [
@@ -54,7 +54,7 @@ Future<int> main(List<String> args) async {
 
   final String inputFilePath = results['input'];
   final String outputFilePath = results['output'];
-  final String outputType = results['outtype'];
+  final String outputType = results['output-type'];
 
   // Validate arguments
   if (inputFilePath == null) {
