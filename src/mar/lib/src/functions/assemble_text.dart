@@ -82,7 +82,7 @@ class _TextWriterLineVisitor implements LineVisitor {
     _writeIndentation();
     _writeLabelIfExists(instruction);
 
-    _buffer.write(mnemonicToString(instruction.mnemonic).toUpperCase());
+    _buffer.write(mnemonicToString(instruction.mnemonic));
 
     if (instruction.operand1 != null) {
       _buffer.write(' ');

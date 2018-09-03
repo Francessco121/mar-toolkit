@@ -6,8 +6,8 @@ import 'package:mar/mar.dart';
 import '../disassembly/disassembly.dart';
 
 const int _contentPadding = 12;
-const int _hexdumpPadding = 40;
-const int _textHexdumpPadding = 56;
+const int _hexdumpPadding = 45;
+const int _textHexdumpPadding = 65;
 
 String writeDisassembly(List<DisassemblyLine> lines) {
   final buffer = new StringBuffer();
