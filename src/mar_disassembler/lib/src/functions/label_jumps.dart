@@ -9,39 +9,52 @@ void labelJumps(List<DisassemblyLine> lines) {
     final DisassemblyLine line = lines[i];
     final DisassembledContent content = line.content;
 
-    if (content is DisassembledInstruction) {
-      if (_isJumpMnemonic(content.mnemonic) && content.operand1 != null) {
-        final InstructionOperand operand = content.operand1;
+    // Check if the current line is a jump with an immediate operand
+    if (content is DisassembledInstruction 
+      && _isJumpMnemonic(content.mnemonic)
+      && content.operand1 is ImmediateOperand
+    ) {
+      final ImmediateOperand operand = content.operand1;
 
-        if (operand is ImmediateOperand) {
-          final int address = operand.value;
-          final int addressIndex = _getAddressIndex(lines, address);
+      final int address = operand.value;
+      final int addressIndex = _getAddressIndex(lines, address);
 
-          if (addressIndex != null) {
-            final String label = 'label_${nextLabelIndex++}';
+      // Ensure the jump-to address is in the binary
+      if (addressIndex != null) {
+        String label;
+        bool labelReused = false;
 
-            // Replace immediate operand with a label
-            lines[i] = DisassemblyLine(
-              line.address,
-              DisassembledInstruction(content.mnemonic,
-                operand1: LabelOperand(label),
-                operand2: content.operand2
-              ),
-              line.rawBytes
-            );
-            
-            // Insert a label at the address
-            lines.insert(addressIndex, DisassemblyLine(
-              null, 
-              DisassembledLabel(label),
-              null
-            ));
+        final DisassembledContent targetContent = lines[addressIndex].content;
+        if (targetContent is DisassembledLabel) {
+          // Re-use label
+          label = targetContent.label;
+          labelReused = true;
+        } else {
+          label = 'label_${nextLabelIndex++}';
+        }
 
-            // Skip an index if the inserted line was before
-            // the current line
-            if (addressIndex <= i) {
-              i++;
-            }
+        // Replace immediate operand with a label
+        lines[i] = DisassemblyLine(
+          line.address,
+          DisassembledInstruction(content.mnemonic,
+            operand1: LabelOperand(label),
+            operand2: content.operand2
+          ),
+          line.rawBytes
+        );
+        
+        if (!labelReused) {
+          // Insert a label at the address
+          lines.insert(addressIndex, DisassemblyLine(
+            null, 
+            DisassembledLabel(label),
+            null
+          ));
+        
+          // Skip an index if the inserted line was before
+          // the current line
+          if (addressIndex <= i) {
+            i++;
           }
         }
       }
@@ -51,20 +64,23 @@ void labelJumps(List<DisassemblyLine> lines) {
 
 int _getAddressIndex(List<DisassemblyLine> lines, int address) {
   int lastAddress = null;
+  DisassemblyLine lastLine = null;
 
   // TODO: Implement faster search algorithm
   for (int i = 0; i < lines.length; i++) {
     final DisassemblyLine line = lines[i];
 
-    if (line.address == null) {
-      continue;
-    }
-
     if (line.address == address) {
-      return i;
+      if (lastLine.content is DisassembledLabel) {
+        // Re-use label
+        return i - 1;
+      } else {
+        return i;
+      }
     }
 
-    if (lastAddress != null 
+    if (lastAddress != null
+      && line.address != null
       && lastAddress < address 
       && line.address > address
     ) {
@@ -73,6 +89,7 @@ int _getAddressIndex(List<DisassemblyLine> lines, int address) {
     }
 
     lastAddress = line.address;
+    lastLine = line;
   }
 
   // ignore: avoid_returning_null
