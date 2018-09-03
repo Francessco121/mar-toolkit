@@ -305,6 +305,10 @@ class _Scanner {
           case $t:
             buffer.writeCharCode($tab);
             break;
+          // \f
+          case $f:
+            buffer.writeCharCode($ff);
+            break;
           // \0
           case $0:
             buffer.writeCharCode($nul);
