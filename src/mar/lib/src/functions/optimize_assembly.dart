@@ -244,8 +244,13 @@ class _Optimizer {
     } else if (operand1 is MemoryInstructionOperand && operand2 is MemoryInstructionOperand) {
       // Memory
       return _memoryOperandsEqual(operand1.value, operand2.value)
-        && _displacementOperandsEqual(operand1.displacement?.value, operand2.displacement?.value)
-        && operand1.displacement?.$operator == operand2.displacement?.$operator;
+        && (
+          (operand1.displacement == null && operand2.displacement == null)
+          || (
+            _displacementOperandsEqual(operand1.displacement?.value, operand2.displacement?.value)
+            && operand1.displacement?.$operator == operand2.displacement?.$operator
+          )
+        );
     } else {
       return false;
     }
