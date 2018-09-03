@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:mar/mar.dart';
@@ -5,9 +6,10 @@ import 'package:meta/meta.dart';
 
 import '../disassembly/disassembly.dart';
 import '../selector_type.dart';
+import '../source.dart';
 
-List<DisassemblyLine> readBinary(Uint8List data) {
-  final reader = new _BinaryReader(data);
+List<DisassemblyLine> readBinary(Source source, Uint8List data) {
+  final reader = new _BinaryReader(source.start, data);
   reader.read();
 
   return reader.lines;
@@ -22,12 +24,14 @@ class _BinaryReader {
   static const int _memoryImm16 = 0x1E; // 0x1E = 0b1_1110
   static const int _immediate16 = 0x1F; // 0x1F = 0b1_1111
 
+  int _dataPosition = 0;
   int _position = 0;
   int _current;
 
+  final int _startOffset;
   final Uint8List _data;
 
-  _BinaryReader(this._data)
+  _BinaryReader(this._startOffset, this._data)
     : assert(_data != null);
 
   void read() {
@@ -40,8 +44,10 @@ class _BinaryReader {
   }
 
   void _readInstruction() {
-    final int address = (_position ~/ 2) - 1;
+    // Calculate the current address
+    final int address = ((_position + _startOffset) ~/ 2);
 
+    // Read the next word as an instruction
     final int instructionWord = _advance();
 
     // Extract the opcode from the lower 6 bits
@@ -108,9 +114,17 @@ class _BinaryReader {
     if (type == SelectorType.immediate16) {
       final int operandWord = _advance();
 
+      if (operandWord == null) {
+        return null;
+      }
+
       return ImmediateOperand(operandWord);
     } else if (type == SelectorType.memoryImmediate16) {
       final int operandWord = _advance();
+
+      if (operandWord == null) {
+        return null;
+      }
 
       return MemoryInstructionOperand(ImmediateOperand(operandWord));
     } else if (type == SelectorType.register16) {
@@ -125,6 +139,11 @@ class _BinaryReader {
       return MemoryInstructionOperand(RegisterOperand(register));
     } else if (type == SelectorType.memoryRegisterDisplaced16) {
       final int operandWord = _advance();
+
+      if (operandWord == null) {
+        return null;
+      }
+
       final int registerIndex = rawSelector - 0x10;
       final Register register = indexesToRegisters[registerIndex];
 
@@ -206,21 +225,26 @@ class _BinaryReader {
   }
 
   Uint8List _getRawData(int address, int wordLength) {
-    final int position = address * 2;
-    final int byteLength = wordLength * 2;
+    final int position = math.max(0, (address * 2) - _startOffset);
+    int byteLength = wordLength * 2;
+
+    if (position + byteLength > _data.length) {
+      byteLength = _data.length - position;
+    }
 
     return Uint8List.view(_data.buffer, position, byteLength);
   }
 
   int _advance() {
     int word = _current;
+    _position = _dataPosition;
     _current = _readWord();
 
     return word;
   }
 
   int _readWord() {
-    if (_position >= _data.length) {
+    if (_dataPosition >= _data.length) {
       // ignore: avoid_returning_null
       return null;
     }
@@ -241,8 +265,8 @@ class _BinaryReader {
   }
   
   int _readByte() {
-    if (_position < _data.length) {
-      return _data[_position++];
+    if (_dataPosition < _data.length) {
+      return _data[_dataPosition++];
     } else {
       // ignore: avoid_returning_null
       return null;
@@ -250,6 +274,6 @@ class _BinaryReader {
   }
 
   bool _isAtEnd() {
-    return  _current == null;
+    return _current == null;
   }
 }

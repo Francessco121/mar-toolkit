@@ -40,6 +40,13 @@ Alternatively:
 mar_disassembler -i program.bin -o program.out.mar
 ```
 
+#### Disassembling only part of a binary
+The region of the input file that is read can be changed with the `startoffset` and `endoffset` arguments. This can be useful for example, to only read the first 100 bytes of a downloaded floppy binary from MAR:
+
+```bat
+mar_disassembler -i floppy.bin -o floppy.out.mar --endoffset=100
+```
+
 ## Testing
 Test programs to be disassembled are placed under the [test](./test) directory. Each subfolder represents a test case. Output files should use the file extension `.out.mar` (as this extension is already ignored by git).
 

@@ -4,15 +4,20 @@ import 'package:charcode/charcode.dart';
 import 'package:mar/mar.dart';
 
 import '../disassembly/disassembly.dart';
+import '../source.dart';
 
 const int _contentPadding = 12;
 const int _hexdumpPadding = 45;
-const int _textHexdumpPadding = 65;
+const int _textHexdumpPadding = 68;
 
-String writeDisassembly(List<DisassemblyLine> lines) {
+String writeDisassembly(Source source, List<DisassemblyLine> lines) {
   final buffer = new StringBuffer();
   final visitor = new _LineVisitor(buffer);
 
+  // Insert a header
+  _writeHeader(source, buffer);
+
+  // Write lines
   for (DisassemblyLine line in lines) {
     int column = 0;
 
@@ -43,8 +48,8 @@ String writeDisassembly(List<DisassemblyLine> lines) {
     if (line.rawBytes != null) {
       column += _pad(buffer, _hexdumpPadding - column);
 
-      final String binaryDump = _getBinaryHexdump(line.rawBytes);
-      buffer.write('; $binaryDump');
+      final String binaryDump = '; ' + _getBinaryHexdump(line.rawBytes);
+      buffer.write(binaryDump);
       column += binaryDump.length;
 
       column += _pad(buffer, _textHexdumpPadding - column);
@@ -58,6 +63,66 @@ String writeDisassembly(List<DisassemblyLine> lines) {
   }
 
   return buffer.toString();
+}
+
+void _writeHeader(Source source, StringBuffer buffer) {
+  final int totalBytes = source.end - source.start;
+
+  // Source info
+  buffer.writeln('; Disassembly of ${source.uri}');
+
+  if (totalBytes == 0) {
+    buffer.writeln('; No data (0 bytes total)');
+  } else {
+    buffer.write('; Bytes ${source.start}-${source.end - 1} ');
+    buffer.write('($totalBytes ');
+    buffer.write(totalBytes == 1 ? 'byte' : 'bytes');
+    buffer.write(' total)');
+    buffer.writeln();
+  }
+
+  buffer.writeln();
+
+  // Headers
+  const String addressHeader = 'Address';
+  const String assemblyHeader = 'Assembly';
+  const String binaryHeader = 'Binary';
+  const String textHeader = 'Text'; 
+
+  buffer.write('; ');
+
+  int column = 2;
+
+  buffer.write(addressHeader);
+  column += addressHeader.length;
+
+  column += _pad(buffer, _contentPadding - column);
+
+  buffer.write(assemblyHeader);
+  column += assemblyHeader.length;
+
+  column += _pad(buffer, _hexdumpPadding - column);
+
+  buffer.write(binaryHeader);
+  column += binaryHeader.length;
+
+  column += _pad(buffer, _textHexdumpPadding - column);
+
+  buffer.write(textHeader);
+  column += textHeader.length;
+
+  buffer.writeln();
+
+  // Header line
+  const int headerLineLength = _textHexdumpPadding + textHeader.length;
+  
+  buffer.write('; ');
+
+  for (int i = 0; i < headerLineLength; i++) {
+    buffer.write('-');
+  }
+
+  buffer.writeln();
 }
 
 class _LineVisitor implements DisassembledContentVisitor {
