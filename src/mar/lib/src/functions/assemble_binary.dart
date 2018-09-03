@@ -182,14 +182,16 @@ class _LineVisitor implements LineVisitor {
     // Write the instruction
     _write(instructionWord);
 
-    // Write the source word
-    if (instruction.operand1 != null) {
-      _writeOperand(instruction.operand1);
-    }
-
-    // Write the destination word
+    // Write the operands
     if (instruction.operand2 != null) {
+      // Write the source word
       _writeOperand(instruction.operand2);
+
+      // Write the destination word
+      _writeOperand(instruction.operand1);
+    } else if (instruction.operand1 != null) {
+      // Write the source word
+      _writeOperand(instruction.operand1);
     }
   }
 

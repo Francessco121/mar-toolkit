@@ -20,7 +20,10 @@ class Instruction implements Labelable, Line {
     this.operand2,
     this.label, 
     this.comment
-  });
+  }) {
+    // If operand2 was specified, operand1 must exist
+    assert(operand2 == null || operand1 != null);
+  }
 
   @override
   void accept(LineVisitor visitor) {
