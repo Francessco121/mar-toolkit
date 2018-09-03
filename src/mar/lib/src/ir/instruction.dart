@@ -6,21 +6,32 @@ import 'line_visitor.dart';
 
 class Instruction implements Labelable, Line {
   @override
-  final String comment;
+  String comment;
   
   @override
-  final String label;
+  String label;
 
-  final Mnemonic mnemonic;
-  final InstructionOperand operand1;
-  final InstructionOperand operand2;
+  Mnemonic get mnemonic => _mnemonic;
 
-  Instruction(this.mnemonic, {
+  set mnemonic(Mnemonic value) {
+    assert(value != null);
+    _mnemonic = value;
+  }
+
+  InstructionOperand operand1;
+  InstructionOperand operand2;
+
+  Mnemonic _mnemonic;
+
+  Instruction(Mnemonic mnemonic, {
     this.operand1,
     this.operand2,
     this.label, 
     this.comment
-  }) {
+  }) 
+    : assert(mnemonic != null),
+      _mnemonic = mnemonic
+  {
     // If operand2 was specified, operand1 must exist
     assert(operand2 == null || operand1 != null);
   }

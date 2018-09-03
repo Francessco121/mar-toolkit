@@ -49,11 +49,13 @@ mmar_assembler --input=main.mmar --output=main.bin --output-type=binary
 ```
 
 #### Creating release builds
-To enable optimizations, the build mode of the assembler can be set to `release` via the `mode` argument (or `m` for short):
+To enable optimizations and unused identifier elimination, the build mode of the assembler can be set to `release` via the `mode` argument (or `m` for short):
 
 ```bat
 mmar_assembler -i main.mmar -o main.bin --mode=release
 ```
+
+**Note:** Unused identifier elimination only applies when assembling to textual MAR as it only removes unused constant and label definitions.
 
 #### Stack optimizations
 By default, release builds will only apply 'safe' optimizations that are guaranteed to never change the behavior of the code. Additional potentially unsafe stack optimizations can be applied with the `stack-optimizations` flag:

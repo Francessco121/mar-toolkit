@@ -6,7 +6,16 @@ class RegisterOperand implements InstructionOperand, MemoryOperand {
   @override
   int get selector => registerIndexes[register];
 
-  final Register register;
+  Register get register => _register;
 
-  RegisterOperand(this.register);
+  set register(Register value) {
+    assert(value != null);
+    _register = value;
+  }
+
+  Register _register;
+
+  RegisterOperand(Register register)
+    : assert(register != null),
+      _register = register;
 }

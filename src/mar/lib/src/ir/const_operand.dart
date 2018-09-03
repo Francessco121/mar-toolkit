@@ -10,7 +10,16 @@ class ConstOperand implements
   @override
   final int selector = 0x1F; // 0x1F = 0b1_1111 = IMMEDIATE16
 
-  final String constIdentifier;
+  String get constIdentifier => _constIdentifier;
 
-  ConstOperand(this.constIdentifier);
+  set constIdentifier(String value) {
+    assert(value != null);
+    _constIdentifier = value;
+  }
+
+  String _constIdentifier;
+
+  ConstOperand(String constIdentifier)
+    : assert(constIdentifier != null),
+      _constIdentifier = constIdentifier;
 }

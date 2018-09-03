@@ -4,12 +4,22 @@ import 'line_visitor.dart';
 
 class Label implements Labelable, Line {
   @override
-  final String comment;
+  String comment;
 
   @override
-  final String label;
+  String get label => _label;
+  
+  @override
+  set label(String value) {
+    assert(value != null);
+    _label = value;
+  }
 
-  Label(this.label, {this.comment});
+  String _label;
+
+  Label(String label, {this.comment})
+    : assert(label != null),
+      _label = label;
 
   @override
   void accept(LineVisitor visitor) {

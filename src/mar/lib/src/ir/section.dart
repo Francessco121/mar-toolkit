@@ -3,11 +3,20 @@ import 'line_visitor.dart';
 
 class Section implements Line {
   @override
-  final String comment;
+  String comment;
   
-  final String identifier;
+  String get identifier => _identifier;
 
-  Section(this.identifier, {this.comment});
+  set identifier(String value) {
+    assert(value != null);
+    _identifier = value;
+  }
+
+  String _identifier;
+
+  Section(String identifier, {this.comment})
+    : assert(identifier != null),
+      _identifier = identifier;
 
   @override
   void accept(LineVisitor visitor) {

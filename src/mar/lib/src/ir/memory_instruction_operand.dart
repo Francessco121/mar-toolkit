@@ -28,9 +28,18 @@ class MemoryInstructionOperand implements InstructionOperand {
     }
   }
 
-  final MemoryOperand value;
-  final Displacement displacement;
+  MemoryOperand get value => _value;
 
-  MemoryInstructionOperand(this.value, {this.displacement})
-    : assert(value != null);
+  set value(MemoryOperand value) {
+    assert(value != null);
+    _value = value;
+  }
+
+  Displacement displacement;
+
+  MemoryOperand _value;
+
+  MemoryInstructionOperand(MemoryOperand value, {this.displacement})
+    : assert(value != null),
+      _value = value;
 }

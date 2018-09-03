@@ -3,11 +3,20 @@ import 'line_visitor.dart';
 
 class OrgDirective implements Line {
   @override
-  final String comment;
+  String comment;
   
-  final int value;
+  int get value => _value;
 
-  OrgDirective(this.value, {this.comment});
+  set value(int value) {
+    assert(value != null);
+    _value = value;
+  }
+
+  int _value;
+
+  OrgDirective(int value, {this.comment})
+    : assert(value != null),
+      _value = value;
 
   @override
   void accept(LineVisitor visitor) {

@@ -3,7 +3,7 @@ import 'line_visitor.dart';
 
 class Comment implements Line {
   @override
-  final String comment;
+  String comment;
 
   Comment(this.comment);
 

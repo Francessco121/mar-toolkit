@@ -5,10 +5,10 @@ import 'line_visitor.dart';
 
 class DwDirective implements Labelable, Line {
   @override
-  final String comment;
+  String comment;
   
   @override
-  final String label;
+  String label;
 
   final List<DwOperand> operands;
 

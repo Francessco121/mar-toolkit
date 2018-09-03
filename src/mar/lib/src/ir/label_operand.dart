@@ -10,7 +10,16 @@ class LabelOperand implements
   @override
   final int selector = 0x1F; // 0x1F = 0b1_1111 = IMMEDIATE16
 
-  final String labelIdentifier;
+  String get labelIdentifier => _labelIdentifier;
 
-  LabelOperand(this.labelIdentifier);
+  set labelIdentifier(String value) {
+    assert(value != null);
+    _labelIdentifier = value;
+  }
+
+  String _labelIdentifier;
+
+  LabelOperand(String labelIdentifier)
+    : assert(labelIdentifier != null),
+      _labelIdentifier = labelIdentifier;
 }

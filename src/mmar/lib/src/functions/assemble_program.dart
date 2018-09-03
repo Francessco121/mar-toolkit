@@ -69,12 +69,26 @@ AssembleResult assembleProgram(Source entrySource, {
   } else {
     final List<mar.Line> lines = compileResult.marLines;
 
-    // Optimize MAR if enabled
+    // Optimize if enabled
     if (optimize) {
+      // Remove unused identifiers
+      //
+      // Note: This first pass is still ran even when compiling to binary
+      // as it can enable further optimizations (optimizations can't take
+      // place on labeled code).
+      mar.removeUnusedIdentifiers(lines);
+
+      // Optimize MAR
       mar.optimizeAssembly(lines,
         passes: optimizationPasses,
         doStackOptimizations: stackOptimizations
       );
+
+      if (outputType == OutputType.text) {
+        // Run the unused identifier eliminator one more time since
+        // optimizations may have created some more
+        mar.removeUnusedIdentifiers(lines);
+      }
     }
 
     // Output

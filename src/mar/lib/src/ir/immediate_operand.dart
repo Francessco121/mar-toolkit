@@ -10,7 +10,16 @@ class ImmediateOperand implements
   @override
   final int selector = 0x1F; // 0x1F = 0b1_1111 = IMMEDIATE16
 
-  final int value;
+  int get value => _value;
 
-  ImmediateOperand(this.value);
+  set value(int value) {
+    assert(value != null);
+    _value = value;
+  }
+
+  int _value;
+
+  ImmediateOperand(int value)
+    : assert(value != null),
+      _value = value;
 }
