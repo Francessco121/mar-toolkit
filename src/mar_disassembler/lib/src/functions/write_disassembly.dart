@@ -171,11 +171,11 @@ class _LineVisitor implements DisassembledContentVisitor {
     if (instruction.operand1 != null) {
       _buffer.write(' ');
       _writeInstructionOperand(instruction.operand1);
+    }
 
-      if (instruction.operand2 != null) {
-        _buffer.write(', ');
-        _writeInstructionOperand(instruction.operand2);
-      }
+    if (instruction.operand2 != null) {
+      _buffer.write(', ');
+      _writeInstructionOperand(instruction.operand2);
     }
   }
 

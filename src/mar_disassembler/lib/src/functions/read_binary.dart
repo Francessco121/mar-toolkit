@@ -45,7 +45,7 @@ class _BinaryReader {
 
   void _readInstruction() {
     // Calculate the current address
-    final int address = ((_position + _startOffset) ~/ 2);
+    final int address = (_position + _startOffset) ~/ 2;
 
     // Read the next word as an instruction
     final int instructionWord = _advance();
@@ -86,24 +86,35 @@ class _BinaryReader {
         operand1 = _getInstructionOperand(sourceType, sourceSelector);
       }
 
-      _addInstruction(
-        address: address, 
-        wordLength: wordLength, 
-        mnemonic: instructionDef.mnemonic,
-        operand1: operand1,
-        operand2: operand2
-      );
-    } else {
-      // Output a DW line with just the one word if we could not decode an instruction.
-      // Just assume it's data for now instead.
-      lines.add(
-        DisassemblyLine(
-          address,
-          DisassembledDwDirective([DwOperand(instructionWord)]),
-          _getRawData(address, 1)
-        )
-      );
+      // Validate the operands
+      final int operand1TypeFlag = operandToTypeFlag(operand1);
+      final int operand2TypeFlag = operandToTypeFlag(operand2);
+
+      if (instructionDef.operand1.isFlagValid(operand1TypeFlag)
+        && instructionDef.operand2.isFlagValid(operand2TypeFlag)
+      ) {
+        // Instruction is valid
+        _addInstruction(
+          address: address, 
+          wordLength: wordLength, 
+          mnemonic: instructionDef.mnemonic,
+          operand1: operand1,
+          operand2: operand2
+        );
+
+        return;
+      }
     }
+
+    // Output a DW line with just the one word if we could not decode an instruction.
+    // Just assume it's data for now instead.
+    lines.add(
+      DisassemblyLine(
+        address,
+        DisassembledDwDirective([DwOperand(instructionWord)]),
+        _getRawData(address, 1)
+      )
+    );
   }
 
   InstructionOperand _getInstructionOperand(SelectorType type, int rawSelector) {
