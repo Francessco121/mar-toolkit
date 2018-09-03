@@ -11,6 +11,7 @@ void reinterpretDisassembly(List<DisassemblyLine> lines) {
 
 class _Reinterpreter {
   int _nextJumpLabelIndex = 0;
+  int _nextCallLabelIndex = 0;
   int _nextDataLabelIndex = 0;
 
   int _i = 0;
@@ -22,8 +23,8 @@ class _Reinterpreter {
   void reinterpret() {
     // Pass #1: Annotate references with labels
     for (_i = 0; _i < _lines.length; _i++) {
-      // Label jumps
-      _tryLabelJump();
+      // Label jumps and calls
+      _tryLabelJumpOrCall();
 
       // Label memory references
       _tryLabelOperandMemory(1);
@@ -56,7 +57,7 @@ class _Reinterpreter {
     }
   }
 
-  void _tryLabelJump() {
+  void _tryLabelJumpOrCall() {
     final DisassemblyLine line = _lines[_i];
     final DisassembledContent content = line.content;
 
@@ -67,8 +68,8 @@ class _Reinterpreter {
 
     final DisassembledInstruction instruction = content;
 
-    // Ensure instruction is for a jump to an immediate address
-    if (!_isJumpMnemonic(instruction.mnemonic)) {
+    // Ensure instruction is for a jump/call to an immediate address
+    if (!_isJumpOrCallMnemonic(instruction.mnemonic)) {
       return;
     }
 
@@ -78,11 +79,11 @@ class _Reinterpreter {
 
     final ImmediateOperand operand = instruction.operand1;
 
-    // Get the jump target address
+    // Get the target address
     final int address = operand.value;
     final int addressIndex = _getAddressIndex(address);
 
-    // Ensure the jump-to address is in the binary
+    // Ensure the target address is in the binary
     if (addressIndex == null) {
       return;
     }
@@ -97,7 +98,11 @@ class _Reinterpreter {
       label = targetContent.label;
       labelReused = true;
     } else {
-      label = 'jump_${_nextJumpLabelIndex++}';
+      if (instruction.mnemonic == Mnemonic.call) {
+        label = 'call_${_nextCallLabelIndex++}';
+      } else {
+        label = 'jump_${_nextJumpLabelIndex++}';
+      }
     }
 
     // Replace immediate operand with a label reference
@@ -274,8 +279,9 @@ class _Reinterpreter {
     return null;
   }
 
-  bool _isJumpMnemonic(Mnemonic mnemonic) {
-    return mnemonic == Mnemonic.ja
+  bool _isJumpOrCallMnemonic(Mnemonic mnemonic) {
+    return mnemonic == Mnemonic.call
+      || mnemonic == Mnemonic.ja
       || mnemonic == Mnemonic.jc
       || mnemonic == Mnemonic.jg
       || mnemonic == Mnemonic.jge
