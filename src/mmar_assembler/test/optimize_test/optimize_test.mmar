@@ -1,0 +1,41 @@
+.text
+  ; Should condense to mov A, B
+  mov A, B
+  mov B, A
+
+  ; Should condense to mov X, Y
+  mov X, Y
+  mov Y, X
+  mov Y, X
+
+  ; Should condense to mov A, 5
+  mov A, 0
+  mov A, 1
+  mov A, 2
+  mov A, 3
+  mov A, 4
+  mov A, 5
+
+  ; Should be removed
+  mov X, X
+
+  ; Should be condensed to just a labeled inc
+  jmp label
+  label: inc A
+
+  ; Should be left alone since they are labeled
+  label_2: mov X, Y
+  label_3: mov Y, X
+
+  ; Should be condensed into a single mov
+  ; (if stack optimizations are enabled)
+  push 1
+  pop A
+
+  ; Should be removed
+  ; (if stack optimizations are enabled)
+  push A
+  pop A
+
+  ; End of test
+  brk
