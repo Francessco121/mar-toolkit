@@ -48,6 +48,24 @@ The assembler's output type is specified with the `output-type` argument (or `t`
 mmar_assembler --input=main.mmar --output=main.bin --output-type=binary
 ```
 
+#### Creating release builds
+To enable optimizations, the build mode of the assembler can be set to `release` via the `mode` argument (or `m` for short):
+
+```bat
+mmar_assembler -i main.mmar -o main.bin --mode=release
+```
+
+#### Stack optimizations
+By default, release builds will only apply 'safe' optimizations that are guaranteed to never change the behavior of the code. Additional potentially unsafe stack optimizations can be applied with the `stack-optimizations` flag:
+
+```bat
+mmar_assembler -i main.mmar -o main.bin -m release --stack-optimizations
+```
+
+Stack optimizations are only safe to be used when the program never intentionally reads from directly below the stack pointer (`SP`). This is because these optimizations may remove `push` instructions that it marks as redundant. However, most programs that use the stack 'normally' should be able to take advantage of this feature.
+
+See the [language docs](../../docs/mmar/stack-optimizations.md) for a full list of all stack optimizations applied by the assembler.
+
 ## Testing
 Test MMAR programs should be created under the [test](./test) directory. Each subfolder represents a test case. Output files should use the file extensions `.out.mar` for text output and `.bin` for binary (as these are already ignored by git).
 

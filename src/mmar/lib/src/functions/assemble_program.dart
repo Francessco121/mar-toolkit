@@ -17,8 +17,15 @@ import 'scan.dart';
 /// 
 /// Use the [outputType] argument to specify whether the output
 /// should be binary or text.
+/// 
+/// Specify whether optimizations should be done with the [optimize]
+/// argument. If `true`, the number of [optimizationPasses] can be
+/// set as well as whether [stackOptimizations] should be performed.
 AssembleResult assembleProgram(Source entrySource, {
-  OutputType outputType = OutputType.text
+  OutputType outputType = OutputType.text,
+  bool optimize = false,
+  int optimizationPasses = 1,
+  bool stackOptimizations = false
 }) {
   assert(entrySource != null);
   assert(outputType != null);
@@ -60,14 +67,25 @@ AssembleResult assembleProgram(Source entrySource, {
     // Don't output assembly if an error occurred
     return AssembleResult(program, errors: aggregatedErrors);
   } else {
+    final List<mar.Line> lines = compileResult.marLines;
+
+    // Optimize MAR if enabled
+    if (optimize) {
+      mar.optimizeAssembly(lines,
+        passes: optimizationPasses,
+        doStackOptimizations: stackOptimizations
+      );
+    }
+
+    // Output
     if (outputType == OutputType.text) {
       // Write the IR to a textual MAR form
-      final String compiledMarContents = mar.assembleText(compileResult.marLines);
+      final String compiledMarContents = mar.assembleText(lines);
 
       return AssembleResult(program, output: compiledMarContents);
     } else if (outputType == OutputType.binary) {
       // Write the IR to binary MAR form
-      final UnmodifiableListView<Uint8List> binary = mar.assembleBinary(compileResult.marLines);
+      final UnmodifiableListView<Uint8List> binary = mar.assembleBinary(lines);
 
       return AssembleResult(program, output: binary);
     } else {

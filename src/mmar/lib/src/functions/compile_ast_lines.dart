@@ -52,13 +52,13 @@ AstLineCompileResult compileAstLines(List<Line> lines, Identifiers identifiers) 
 
   // All set
   return AstLineCompileResult(
-    marLines: UnmodifiableListView(marCode),
+    marLines: marCode,
     errors: UnmodifiableListView(errors)
   );
 }
 
 class AstLineCompileResult {
-  final UnmodifiableListView<mar.Line> marLines;
+  final List<mar.Line> marLines;
   final UnmodifiableListView<MmarError> errors;
 
   AstLineCompileResult({

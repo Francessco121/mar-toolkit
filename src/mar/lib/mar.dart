@@ -4,6 +4,7 @@ export 'src/ir/ir.dart';
 // Functions
 export 'src/functions/assemble_binary.dart';
 export 'src/functions/assemble_text.dart';
+export 'src/functions/optimize_assembly.dart';
 
 // Misc
 export 'src/instruction_definition.dart';

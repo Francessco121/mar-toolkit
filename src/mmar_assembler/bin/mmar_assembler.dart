@@ -36,6 +36,31 @@ Future<int> main(List<String> args) async {
     defaultsTo: 'text'
   );
 
+  _parser.addOption('mode',
+    abbr: 'm',
+    help: 'Sets the mode of the assembler (e.g. debug or release).',
+    allowed: [
+      'debug',
+      'release'
+    ],
+    allowedHelp: {
+      'debug': 
+        'Program will be assembled with debug information and without optimizations.',
+      'release':
+        'Program will be assembled without debug information and will be optimized.'
+    },
+    defaultsTo: 'debug'
+  );
+
+  _parser.addFlag('stack-optimizations',
+    help: 
+      'Specifies that stack optimizations should be applied.\n'
+      'See the language docs for more information.\n'
+      'Ignored if the mode is set to debug.',
+    defaultsTo: false,
+    negatable: false
+  );
+
   _parser.addCommand('help');
 
   ArgResults results;
@@ -55,6 +80,8 @@ Future<int> main(List<String> args) async {
   final String inputFilePath = results['input'];
   final String outputFilePath = results['output'];
   final String outputType = results['output-type'];
+  final String mode = results['mode'];
+  final bool stackOptimizations = results['stack-optimizations'];
 
   // Validate arguments
   if (inputFilePath == null) {
@@ -72,7 +99,11 @@ Future<int> main(List<String> args) async {
   stopwatch.start();
 
   // Assemble the file
-  final bool success = await _assembleFile(inputFilePath, outputFilePath, outputType);
+  final bool success = await _assembleFile(inputFilePath, outputFilePath, 
+    outputType: outputType,
+    mode: mode,
+    stackOptimizations: stackOptimizations
+  );
 
   // Let the user know how long it took to assemble their program
   stopwatch.stop();
@@ -82,7 +113,11 @@ Future<int> main(List<String> args) async {
   return success ? 0 : 1;
 }
 
-Future<bool> _assembleFile(String inputFilePath, String outputFilePath, String outputType) async {
+Future<bool> _assembleFile(String inputFilePath, String outputFilePath, {
+  String outputType,
+  String mode,
+  bool stackOptimizations
+}) async {
   // Load the input source
   Source entrySource;
   try {
@@ -94,7 +129,9 @@ Future<bool> _assembleFile(String inputFilePath, String outputFilePath, String o
 
   /// Assemble the program
   final AssembleResult result = assembleProgram(entrySource,
-    outputType: outputType == 'binary' ? OutputType.binary : OutputType.text
+    outputType: outputType == 'binary' ? OutputType.binary : OutputType.text,
+    optimize: mode == 'release',
+    stackOptimizations: stackOptimizations
   );
 
   if (result.errors.isNotEmpty) {
