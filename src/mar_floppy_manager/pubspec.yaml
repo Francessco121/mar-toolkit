@@ -1,0 +1,13 @@
+name: mar_floppy_manager
+author: Ethan Lafrenais
+
+publish_to: none
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+executables:
+  mar_floppy_manager:
+
+dependencies:
+  args: ^1.5.0

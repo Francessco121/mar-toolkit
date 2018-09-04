@@ -7,15 +7,20 @@ The HLML toolkit is a set of programs meant for building bots for the game [Much
 ## Current Features
 
 ### Macro MAR (MMAR) assembly language
-The MMAR language is designed to be a superset of Much Assembly Required's language. In addition to all the features of MAR, MMAR adds its own features such as macros, file modularity, and assemble-time math.
+The Macro MAR language is designed to be a superset of Much Assembly Required's language. In addition to all the features of MAR, MMAR adds its own features such as macros, file modularity, and assemble-time math.
 
 - [Macro MAR language reference](./docs/mmar)
-- [Macro MAR assembler](./src/mmar_assembler)
+- [Macro MAR Assembler](./src/mmar_assembler)
 
-### MAR disassembler
+### MAR Disassembler
 The toolkit contains a disassembler that can be used to inspect binary MAR code.
 
-- [MAR disassembler](./src/mar_disassembler)
+- [MAR Disassembler](./src/mar_disassembler)
+
+### MAR Floppy Manager
+A 'floppy disk' manager is included in the toolkit to ease the process of reading/writing binary data to/from 'MAR floppy disks'.
+
+- [MAR Floppy Manager](./src/mar_floppy_manager)
 
 ## Future Goals
 - The HLML compiler
