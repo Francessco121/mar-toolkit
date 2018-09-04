@@ -13,7 +13,7 @@ The MMAR assembler supports assembling MMAR and MAR code into binary form. [See 
 
 The assembler can optionally prepend a 'relocation section' to an assembled binary. This is used to allow binary code to be loaded anywhere in memory, without breaking absolute memory addresses. When a relocation section is generated, the `ORG` directive is ignored and all addresses are resolved as if the program starts at address `0x0000`. This effectively makes each memory reference an offset from the beginning of the program. The relocation section contains a list of offsets from the beginning of the program that point to every memory reference in the program. This can be used to patch all each memory address before actually running the binary. 
 
-For example, to load a binary at the address of `0x1000`, the program would read the relocation section and add `0x1000` to every memory address in the program. After that, the program can be ran successfully.
+For example, to load a binary at the address of `0x1000`, the program would read the relocation section and add `0x1000` to every memory reference in the program. After that, the program can be ran successfully.
 
 ### Relocation section format
 
