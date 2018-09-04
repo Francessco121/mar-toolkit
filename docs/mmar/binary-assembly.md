@@ -94,6 +94,25 @@ _0x0015:    DW 0x0021                        ; 00 21              .!
 _0x0016:    DW 0x0000                        ; 00 00              ..
 ```
 
+The following diff shows the changes that would be made from successfully relocating the previous program:
+
+```diff
+ ...
+             ; Start of program
+-_0x0006:    call 0x0003                      ; f8 15 00 03        ø...
++_0x0006:    call 0x0009                      ; f8 15 00 09        ø...
+ _0x0008:    brk                              ; 00 00              ..
+
+ ...
+
+ _0x0009:    mov A, 0x0002                    ; f8 41 00 02        øA..
+-_0x000b:    mov X, 0x000a                    ; f9 41 00 0a        ùA..
++_0x000b:    mov X, 0x0010                    ; f9 41 00 10        ùA..
+ _0x000d:    hwi 0x0009                       ; f8 09 00 09        ø...
+
+ ...
+```
+
 ## ORG directive differences
 
 > Note: The `ORG` directive is ignored if the binary is assembled with a relocation section.
