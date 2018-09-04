@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import 'package:charcode/charcode.dart';
+
 import '../ir/ir.dart';
 import '../instruction_definition.dart';
 import '../instructions.dart';
@@ -11,8 +13,14 @@ import '../instructions.dart';
 /// The [chunkSize] parameter specifies the maximum size of each [Uint8List].
 /// The [chunkSize] must be a multiple of 2 and greater than 0.
 /// 
+/// If [generateRelocationSection] is `true`, a relocation section will be
+/// prepended to the binary data.
+/// 
 /// Each word is encoded in big-endian.
-UnmodifiableListView<Uint8List> assembleBinary(List<Line> lines, {int chunkSize = 2048}) {
+UnmodifiableListView<Uint8List> assembleBinary(List<Line> lines, {
+  int chunkSize = 2048,
+  bool generateRelocationSection = false
+}) {
   assert(lines != null);
   assert(chunkSize != null);
   assert(chunkSize > 0);
@@ -37,17 +45,47 @@ UnmodifiableListView<Uint8List> assembleBinary(List<Line> lines, {int chunkSize 
       labelAddress = -labelAddress;
     }
 
-    if (visitor.addressOffset != null) {
+    if (!generateRelocationSection && visitor.addressOffset != null) {
       // Offset the address by the ORG value
       labelAddress += visitor.addressOffset;
     }
 
     // Overwrite the placeholder with the correct address
-    final Uint8List chunk = visitor.chunks[(reference.address / chunkSize).floor()];
-    final referenceAddress = reference.address % chunkSize;
+    final Uint8List chunk = visitor.chunks[(reference.byteOffset / chunkSize).floor()];
+    final chunkByteOffset = reference.byteOffset % chunkSize;
 
-    chunk[referenceAddress] = labelAddress >> 8;
-    chunk[referenceAddress + 1] = labelAddress;
+    chunk[chunkByteOffset] = labelAddress >> 8;
+    chunk[chunkByteOffset + 1] = labelAddress;
+  }
+
+  // Generate the relocation section if specified
+  if (generateRelocationSection) {
+    final int relocationSectionSize = 
+        (3 * 2)                                    // Header
+      + 2                                          // List length
+      + (visitor.unresolvedReferences.length * 2); // Address list
+
+    final relocationSection = new Uint8List(relocationSectionSize);
+
+    // Write header
+    relocationSection[1] = $R;
+    relocationSection[3] = $L;
+    relocationSection[5] = $C;
+
+    // Write list size
+    relocationSection[6] = visitor.unresolvedReferences.length >> 8;
+    relocationSection[7] = visitor.unresolvedReferences.length;
+
+    // Write address offsets
+    int i = 0;
+    for (final reference in visitor.unresolvedReferences) {
+      final int address = reference.byteOffset ~/ 2;
+
+      relocationSection[8 + i++] = address >> 8;
+      relocationSection[8 + i++] = address;
+    }
+
+    visitor.chunks.insert(0, relocationSection);
   }
 
   // Replace the last chunk with a view if it is smaller than the chunk size
@@ -65,15 +103,15 @@ UnmodifiableListView<Uint8List> assembleBinary(List<Line> lines, {int chunkSize 
 /// These are the product of the first pass of writing
 /// the IR to binary, and are resolved on the second pass.
 class _UnresolvedLabelReference {
-  /// The address of the unresolved reference.
-  final int address;
+  /// The byte offset of the unresolved reference.
+  final int byteOffset;
   /// The name of the label.
   final String label;
   /// Whether the value should be negated before
-  /// being written to the [address].
+  /// being written to the [byteOffset].
   final bool negate;
 
-  _UnresolvedLabelReference(this.address, this.label, {this.negate = false});
+  _UnresolvedLabelReference(this.byteOffset, this.label, {this.negate = false});
 }
 
 class _LineVisitor implements LineVisitor {
@@ -94,7 +132,7 @@ class _LineVisitor implements LineVisitor {
   /// Will be `null` if no `ORG` directive was visited.
   int get addressOffset => _addressOffset;
 
-  int get _currentAddress => _currentChunkIndex * chunks.length;
+  int get _currentByteOffset => _currentChunkIndex * chunks.length;
 
   int _addressOffset = null;
   int _currentChunkIndex = 0;
@@ -216,7 +254,7 @@ class _LineVisitor implements LineVisitor {
     // We don't necessarily know the address of the label yet,
     // so add a placeholder word and mark it as unresolved.
     unresolvedReferences.add(_UnresolvedLabelReference(
-      _currentAddress,
+      _currentByteOffset,
       operand.labelIdentifier,
       negate: negate
     ));
@@ -298,7 +336,7 @@ class _LineVisitor implements LineVisitor {
 
   /// Marks the given [label] as being at the current address.
   void _markLabelAsCurrent(String label) {
-    labels[label] = _currentAddress ~/ 2;
+    labels[label] = _currentByteOffset ~/ 2;
   }
 
   int _getOperandSelector(InstructionOperand operand) {

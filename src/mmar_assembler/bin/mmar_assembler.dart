@@ -38,7 +38,7 @@ Future<int> main(List<String> args) async {
 
   _parser.addOption('mode',
     abbr: 'm',
-    help: 'Sets the mode of the assembler (e.g. debug or release).',
+    help: 'Sets the build mode of the assembler (e.g. debug or release).',
     allowed: [
       'debug',
       'release'
@@ -55,8 +55,17 @@ Future<int> main(List<String> args) async {
   _parser.addFlag('stack-optimizations',
     help: 
       'Specifies that stack optimizations should be applied.\n'
-      'See the language docs for more information.\n'
-      'Ignored if the mode is set to debug.',
+      'Ignored if the mode is set to debug.\n'
+      'See the language docs for more information.',
+    defaultsTo: false,
+    negatable: false
+  );
+
+  _parser.addFlag('relocation-section',
+    help: 
+      'Specifies that a relocation section should be prepended to the binary.\n'
+      'Ignored if the output type is text.\n'
+      'See the language docs for more information.',
     defaultsTo: false,
     negatable: false
   );
@@ -82,6 +91,7 @@ Future<int> main(List<String> args) async {
   final String outputType = results['output-type'];
   final String mode = results['mode'];
   final bool stackOptimizations = results['stack-optimizations'];
+  final bool relocationSection = results['relocation-section'];
 
   // Validate arguments
   if (inputFilePath == null) {
@@ -102,7 +112,8 @@ Future<int> main(List<String> args) async {
   final bool success = await _assembleFile(inputFilePath, outputFilePath, 
     outputType: outputType,
     mode: mode,
-    stackOptimizations: stackOptimizations
+    stackOptimizations: stackOptimizations,
+    relocationSection: relocationSection
   );
 
   // Let the user know how long it took to assemble their program
@@ -116,7 +127,8 @@ Future<int> main(List<String> args) async {
 Future<bool> _assembleFile(String inputFilePath, String outputFilePath, {
   String outputType,
   String mode,
-  bool stackOptimizations
+  bool stackOptimizations,
+  bool relocationSection
 }) async {
   // Load the input source
   Source entrySource;
@@ -131,7 +143,8 @@ Future<bool> _assembleFile(String inputFilePath, String outputFilePath, {
   final AssembleResult result = assembleProgram(entrySource,
     outputType: outputType == 'binary' ? OutputType.binary : OutputType.text,
     optimize: mode == 'release',
-    stackOptimizations: stackOptimizations
+    stackOptimizations: stackOptimizations,
+    generateRelocationSection: relocationSection
   );
 
   if (result.errors.isNotEmpty) {

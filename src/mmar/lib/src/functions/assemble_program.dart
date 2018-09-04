@@ -21,11 +21,16 @@ import 'scan.dart';
 /// Specify whether optimizations should be done with the [optimize]
 /// argument. If `true`, the number of [optimizationPasses] can be
 /// set as well as whether [stackOptimizations] should be performed.
+/// 
+/// Specify whether a relocation section should be prepended to the
+/// binary with the [generateRelocationSection] argument. 
+/// This is ignored if the [outputType] is `text`.
 AssembleResult assembleProgram(Source entrySource, {
   OutputType outputType = OutputType.text,
   bool optimize = false,
   int optimizationPasses = 1,
-  bool stackOptimizations = false
+  bool stackOptimizations = false,
+  bool generateRelocationSection = false
 }) {
   assert(entrySource != null);
   assert(outputType != null);
@@ -99,7 +104,9 @@ AssembleResult assembleProgram(Source entrySource, {
       return AssembleResult(program, output: compiledMarContents);
     } else if (outputType == OutputType.binary) {
       // Write the IR to binary MAR form
-      final UnmodifiableListView<Uint8List> binary = mar.assembleBinary(lines);
+      final UnmodifiableListView<Uint8List> binary = mar.assembleBinary(lines,
+        generateRelocationSection: generateRelocationSection
+      );
 
       return AssembleResult(program, output: binary);
     } else {

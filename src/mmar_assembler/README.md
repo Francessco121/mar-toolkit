@@ -52,16 +52,25 @@ mmar_assembler --input=main.mmar --output=main.bin --output-type=binary
 To enable optimizations and unused identifier elimination, the build mode of the assembler can be set to `release` via the `mode` argument (or `m` for short):
 
 ```bat
-mmar_assembler -i main.mmar -o main.bin --mode=release
+mmar_assembler -i main.mmar -o main.bin -t binary --mode=release
 ```
 
 **Note:** Unused identifier elimination only applies when assembling to textual MAR as it only removes unused constant and label definitions.
+
+#### Relocation sections
+The assembler is able to prepend a relocation section to a binary build. To enable this, pass the `relocation-section` flag:
+
+```bat
+mmar_assembler -i main.mmar -o main.bin -t binary --relocation-section
+```
+
+See the [language docs](../../docs/mmar/binary-assembly.md#relocation-sections) for more info.
 
 #### Stack optimizations
 By default, release builds will only apply 'safe' optimizations that are guaranteed to never change the behavior of the code. Additional potentially unsafe stack optimizations can be applied with the `stack-optimizations` flag:
 
 ```bat
-mmar_assembler -i main.mmar -o main.bin -m release --stack-optimizations
+mmar_assembler -i main.mmar -o main.bin -t binary -m release --stack-optimizations
 ```
 
 Stack optimizations are only safe to be used when the program never intentionally reads from directly below the stack pointer (`SP`). This is because these optimizations may remove `push` instructions that it marks as redundant. However, most programs that use the stack 'normally' should be able to take advantage of this feature.
