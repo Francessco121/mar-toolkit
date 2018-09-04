@@ -58,40 +58,40 @@ Where the `old_address` is the value found at the memory location specified by t
 The following is an annotated disassembly of a program with a relocation section:
 
 ```asm
-; Address   Assembly                     Binary               Text
-; ----------------------------------------------------------------
+; Address   Assembly                         Binary               Text
+; ----------------------------------------------------------------------
             ; Relocation header
-_0x0000:    DW 0x0052                    ; 00 52              .R
-_0x0001:    DW 0x004c                    ; 00 4c              .L
-_0x0002:    DW 0x0043                    ; 00 43              .C
+_0x0000:    DW 0x0052                        ; 00 52              .R
+_0x0001:    DW 0x004c                        ; 00 4c              .L
+_0x0002:    DW 0x0043                        ; 00 43              .C
 
             ; Number of relocation entries
-_0x0003:    DW 0x0002                    ; 00 02              ..
+_0x0003:    DW 0x0002                        ; 00 02              ..
 
             ; Relocation entries
-_0x0004:    DW 0x0001                    ; 00 01              ..
-_0x0005:    DW 0x0006                    ; 00 06              ..
+_0x0004:    DW 0x0001                        ; 00 01              ..
+_0x0005:    DW 0x0006                        ; 00 06              ..
 
             ; Start of program
-_0x0006:    call 0x0003                  ; f8 15 00 03        ø...
-_0x0008:    brk                          ; 00 00              ..
+_0x0006:    call 0x0003                      ; f8 15 00 03        ø...
+_0x0008:    brk                              ; 00 00              ..
 
             ; Where 'call 0x0003' will 
             ; point to after relocation
-_0x0009:    mov A, 0x0002                ; f8 41 00 02        øA..
-_0x000b:    mov X, 0x000a                ; f9 41 00 0a        ùA..
-_0x000d:    hwi 0x0009                   ; f8 09 00 09        ø...
-_0x000f:    ret                          ; 00 16              ..
+_0x0009:    mov A, 0x0002                    ; f8 41 00 02        øA..
+_0x000b:    mov X, 0x000a                    ; f9 41 00 0a        ùA..
+_0x000d:    hwi 0x0009                       ; f8 09 00 09        ø...
+_0x000f:    ret                              ; 00 16              ..
 
             ; Where 'mov X, 0x000a' will
             ; point to after relocation
-_0x0010:    DW 0x0048                    ; 00 48              .H
-_0x0011:    DW 0x0065                    ; 00 65              .e
-_0x0012:    DW 0x006c                    ; 00 6c              .l
-_0x0013:    DW 0x006c                    ; 00 6c              .l
-_0x0014:    DW 0x006f                    ; 00 6f              .o
-_0x0015:    DW 0x0021                    ; 00 21              .!
-_0x0016:    DW 0x0000                    ; 00 00              ..
+_0x0010:    DW 0x0048                        ; 00 48              .H
+_0x0011:    DW 0x0065                        ; 00 65              .e
+_0x0012:    DW 0x006c                        ; 00 6c              .l
+_0x0013:    DW 0x006c                        ; 00 6c              .l
+_0x0014:    DW 0x006f                        ; 00 6f              .o
+_0x0015:    DW 0x0021                        ; 00 21              .!
+_0x0016:    DW 0x0000                        ; 00 00              ..
 ```
 
 ## ORG directive differences
