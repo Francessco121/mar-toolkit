@@ -1,2 +1,5 @@
+# Include pubspec.lock
+!pubspec.lock
+
 # Test outputs
 *.out.mar
