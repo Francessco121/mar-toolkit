@@ -1,3 +1,5 @@
+[[← back]](./README.md)
+
 # Splitting Up Code In HLML
 
 ## Importing
@@ -8,7 +10,7 @@ HLML supports importing other HLML files through the use of the `import` keyword
 import "bar.hlml";
 
 fn function() void {
-    var number = getInteger();
+  var number: u16 = getInteger();
 }
 ```
 
@@ -16,7 +18,7 @@ fn function() void {
 ```rust
 // The 'pub' keyword exposes a top-level declaration to other files
 pub fn getInteger() u16 {
-    return 0x0123;
+  return 0x0123;
 }
 ```
 
@@ -32,7 +34,7 @@ HLML files can "export" other HLML files with the use of the `export` keyword. T
 ### Example
 **a.hlml**
 ```rust
-pub const SOME_CONSTANT = 24;
+pub let SOME_CONSTANT: u16 = 24;
 ````
 
 **b.hlml**
@@ -45,7 +47,7 @@ export "a.hlml";
 import "b.hlml";
 
 fn function() void {
-    var value = SOME_CONSTANT; // value == 24
+  var value: u16 = SOME_CONSTANT; // value == 24
 }
 ```
 

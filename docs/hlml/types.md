@@ -1,6 +1,11 @@
+[[← back]](./README.md)
+
 # HLML Types
 
-## Built-in Types
+HLML is a strongly-typed language.
+
+## Primitive Types
+
 ### Integers
 - `i8` - 8-bit signed integer
 - `u8` - 8-bit unsigned integer

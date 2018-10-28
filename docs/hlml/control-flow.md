@@ -1,18 +1,30 @@
+[[← back]](./README.md)
+
 # HLML Control Flow
+
+## Contents
+- [Branches](#branches)
+    - [If/else](#ifelse-branching)
+- [Loops](#loops)
+    - [Infinite loop](#infinite-loop)
+    - [While loop](#while-loop)
+    - [Do-while loop](#do-while-loop)
+    - [Special loop statements](#special-loop-statements)
 
 ## Branches
 
-### If/Else If/Else
+### If/else branching
+
+#### Syntax
 ```c
-'if' expression '{' 
-    then_block 
-'}' ( 
-    'else' ( '{' else_block '}' ) 
-         | ( 'if' if_statement )
-)?
+if_statement:
+'if' expression '{' ... '}' else_branch? ;
+
+else_branch:
+'else' ( '{' ... '}' ) | if_statement ;
 ```
 
-#### Simple if
+#### Simple if statement
 ```rust
 if true {
     // condition was true
@@ -29,8 +41,8 @@ if true {
 ```
 
 #### If, else if, and else
-```dart
-var i = ...;
+```rust
+let i: u16 = ...;
 
 if i > 5 {
     // i is greater than 5
@@ -45,10 +57,14 @@ if i > 5 {
 ## Loops
 
 ### Infinite loop
+
+#### Syntax
 ```c
-'loop' '{' loop_block '}'
+loop_statement:
+'loop' '{' ... '}' ;
 ```
 
+#### Example
 ```rust
 // Loops until a break or return statement
 loop {
@@ -57,10 +73,14 @@ loop {
 ```
 
 ### While loop
+
+#### Syntax
 ```c
-'while' expression '{' while_block '}'
+while_statement:
+'while' expression '{' ... '}' ;
 ```
 
+#### Example
 ```rust
 // Loops while condition is true
 //
@@ -71,10 +91,14 @@ while condition {
 ```
 
 ### Do-while loop
+
+#### Syntax
 ```c
-'do' '{' do_while_block '}' 'while' expression ';'
+do_while_statement:
+'do' '{' ... '}' 'while' expression ';' ;
 ```
 
+#### Example
 ```dart
 // Loops while condition is true
 //
@@ -86,84 +110,53 @@ do {
 } while condition;
 ```
 
-### For loop
-```c
-'for' ( var_declaration | expression_stmt | ';' ) expression? ';' expression? '{'
-    for_block
-'}'
-```
 
-**Note:** Each of the 3 parts of a `for` statement are optional.
-
-```dart
-for var i = 0; i < 10; i += 1 {
-    // loops 10 times
-}
-```
-
-```dart
-var i = 0;
-for i = 3; i < 5; i += 1 {
-    // loops 2 times
-}
-```
-
-```dart
-var i = 0;
-for ; i < 5; i += 1 {
-    // loops 5 times
-}
-```
-
-```dart
-var i = 0;
-for ; i < 5; {
-    // loops 5 times
-    i = i + 1;
-}
-```
-
-```rust
-for ;; {
-    // loops infinitely
-}
-```
 ### Special loop statements
 
 #### break
-```c
-'break' ';'
-```
 
 Immediately exits a loop. The `break` statement can be used in any loop structure.
 
-```rust
-var i = 0;
-loop {
-    if i == 5 {
-        // Exit the loop once i is 5
-        break;
-    }
+##### Syntax
+```c
+break_statement:
+'break' ';' ;
+```
 
-    i += 1;
+##### Example
+```rust
+var i: u16 = 0;
+
+loop {
+  if i == 5 {
+    // Exit the loop once i is 5
+    break;
+  }
+
+  i += 1;
 }
 ```
 
 #### continue
-```c
-'continue' ';'
-```
 
 Skips the remainder of an iteration. The `continue` statement can be used in any loop structure.
 
-```dart
-var i = 0;
-while i < 10 {
-    if i % 2 == 0 {
-        // Skip even numbers
-        continue;
-    }
+##### Syntax
+```c
+continue_statement:
+'continue' ';' ;
+```
 
-    // i will only be an odd number here
+##### Example
+```dart
+var i: u16 = 0;
+
+while i < 10 {
+  if i % 2 == 0 {
+    // Skip even numbers
+    continue;
+  }
+
+  // i will only be an odd number here
 }
 ```

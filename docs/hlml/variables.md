@@ -1,114 +1,100 @@
-# HLML Variable Syntax
+[[← back]](./README.md)
 
-## Top-level
+# HLML Variables
+
+## Contents
+- [Syntax](#syntax)
+- [Declaration](#declaration)
+  - [Mutable variables](#mutable-variables)
+  - [Immutable variables](#immutable-variables)
+- [Undefined Variables](#undefined-variables)
+
+## Syntax
+```c
+variable_declaration:
+( 'var' | 'let' ) IDENTIFIER ':' type '=' expression ;
+```
+
+## Declaration
+
+Variables in HLML can be declared in two ways: as a mutable variable or as an immutable variable. Variables can be declared at the top-level of a file or in any scope.
+
+### Mutable variables
+
+Mutable variables can be declared with the `var` keyword. Variables declared as mutable may be changed at any time in the program by other code.
+
 ```dart
-/// Mutable top-level variable
-var a = 3;
-
-/// Immutable top-level variable
-final b = 5;
-
-/// Constant top-level variable
-const C = 10;
+// Declares a top-level mutable variable named 'a' with 
+// the initial value of 3.
+var a: u16 = 3;
 
 entry {
-    a = 5; // Valid
+  // Changes 'a' to be equal to 4.
+  a = 4;
 
-    b = 2; // Compile-time error!
+  // Declares a scoped mutable variabled named 'b' with
+  // the initial value of 5.
+  var b: u16 = 5;
 
-    C = 15; // Compile-time error!
+  // Changes 'b' to have the value of 'a' (which is 4).
+  b = a;
 }
 ```
 
-## In Scopes
-```dart
+### Immutable variables
+
+Immutable variables can be declared with the `let` keyword. Variables declared as immutable cannot be changed after they are declared.
+
+> Note: While immutable variables must have a value at declaration time, that value does not necessarily have to be known at compile-time.
+
+```rust
+// Declares a top-level immutable variable (i.e. a constant)
+// named 'a' with the value of 20.
+let a: u16 = 20;
+
 entry {
-    // Scoped mutable variable
-    var a = 3;
-    a = 5;
+  // Immutable variables may not be changed, so this would
+  // result in a compile-time error.
+  a = 10;
 
-    // Scoped immutable variable
-    final b = 5;
-    b = 2; // Compile-time error!
+  // Declares a scoped immutable variable named 'b' with
+  // the value of 50. This is also a 'constant' technically
+  // because the value is known at compile-time.
+  let b: u16 = 50;
 
-    // Constant immutable variable
-    const C = 10;
-    C = 20; // Compile-time error!
+  // Still results in a compile-time error.
+  b = 20;
+
+  // Declares a scoped immutable variable named 'c' with
+  // the value of whatever is returned from the function
+  // 'getValue'. In this case, 'c' is not a 'constant',
+  // but still may not be changed after declaration.
+  let c: u16 = getValue();
+
+  // Still results in a compile-time error.
+  c = 0;
 }
-```
-
-## Type Annotations
-In most cases, type annotations are optional in HLML.
-
-```dart
-// Creates a variable named 'a' of type 'u8'
-var a: u8 = 30;
-
-// Note: Variable types inferred from integer literals
-//       default to 'u16'.
-//
-// Creates a variable named 'b' of type 'u16'
-var b = 30;
 ```
 
 ## Undefined Variables
 
-All variables in HLML are required to be initialized. To explicitly state that a variable should not be initialized to *a value*, assign it to `undefined`.
+All variables in HLML are required to be initialized. To explicitly state that a variable should not be initialized to *a value*, assign it to `undefined`. Only mutable variables may be initialized to undefined.
 
-```dart
+> Note: This feature is intended to be used rarely as a micro-optimization. It's much safer to give variables an initial value, even if that initial value isn't used.
+
+```swift
 entry {
-    // Allocate space on the stack for 'local'
-    //
-    // Note: The type annotation is required for variables
-    //       initialized to 'undefined'
-    var local: u16 = undefined;
+  // Allocate space on the stack for 'local'
+  var local: u16 = undefined;
 
-    var a = local; // 'a' here could be anything!
+  var a: u16 = local; // 'a' here could be anything!
 
-    local = 30; // 'local' is now initialized to a value
+  local = 30; // 'local' is now initialized to a value
 
-    var b = local; // b == 30
+  var b: u16 = local; // b == 30
+
+  // Results in a compile-time error as immutable variables
+  // *must* have a value at declaration time.
+  let c: u16 = undefined;
 }
-```
-
-## Modifiers
-
-### `const`
-Specifies that the variable's value is known at compile-time and is readonly after initialization. Note: `const` is *not* part of the type in HLML.
-
-#### Examples
-```dart
-const A = 40;
-
-A = 20; // Compile-time error! Cannot change a constant.
-```
-
-```dart
-fn getInteger() u16 { ... }
-
-const B = getInteger(); // Compile-time error! Value not known at compile-time.
-```
-
-```dart
-const C: u16 = undefined; // Compile-time error! Constants must have a value upon initialization.
-```
-
-### `final`
-Specifies that the variable's value is known at declaration time and is readonly after initialization. Note: `final` is *not* part of the type.
-
-#### Examples
-```dart
-final a = 30;
-
-a = 10; // Compile-time error! Cannot change a final after initialization.
-```
-
-```dart
-fn getInteger() u16 { ... }
-
-final b = getInteger(); // OK!
-```
-
-```dart
-final c: u16 = undefined; // Compile-time error! Final variables must have a value upon initialization.
 ```

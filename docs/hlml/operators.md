@@ -1,4 +1,14 @@
+[[← back]](./README.md)
+
 # HLML Operators
+
+## Contents
+- [Arithmetic](#arithmetic)
+- [Bitwise](#bitwise)
+- [Comparison](#comparison)
+- [Logical](#logical)
+- [Grouping](#grouping)
+- [Shorthand](#shorthand)
 
 ## Arithmetic
 ```rust
@@ -82,21 +92,6 @@ false || true // == true
 ```rust
 // Parentheses change operator precedence
 2 * (3 + 2) // == 10
-```
-
-## Pointers
-```rust
-// Address-of
-&variable
-
-// Pointer de-reference
-*pointerVariable
-```
-
-## Special
-```rust
-// Dot access
-structure.field
 ```
 
 ## Shorthand
