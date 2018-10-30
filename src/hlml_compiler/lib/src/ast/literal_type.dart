@@ -1,0 +1,4 @@
+enum LiteralType {
+  integer,
+  boolean
+}

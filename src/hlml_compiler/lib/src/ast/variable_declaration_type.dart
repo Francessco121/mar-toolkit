@@ -1,0 +1,4 @@
+enum VariableDeclarationType {
+  immutable,
+  mutable
+}

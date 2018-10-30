@@ -1,2 +1,6 @@
 # Include pubspec.lock
 !pubspec.lock
+
+# Test outputs
+*.mar
+*.bin
