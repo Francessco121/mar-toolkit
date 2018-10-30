@@ -14,7 +14,7 @@ Functions in HLML work very similarly to other languages. They are a named block
 ## Syntax
 ```dart
 function_statement:
-'fn' IDENTIFIER '(' parameters? ')' type '{' ... '}' ;
+'fn' IDENTIFIER '(' parameters? ')' ( '->' type )? '{' ... '}' ;
 
 parameters:
 parameter ( ',' parameter )* ;
@@ -25,22 +25,23 @@ IDENTIFIER ':' type ;
 
 ## Examples
 ```rust
-/// Parameter-less function which returns no value
-fn function() void {
+/// Parameter-less function which returns no value.
+fn function() {
   // ...
 }
 ```
 
 ```rust
-/// Function which takes 2 unsigned 16-bit integers and returns their sum
-fn add(a: u16, b: u16) u16 {
+/// Function which takes 2 unsigned 16-bit integers and returns their sum.
+fn add(a: u16, b: u16) -> u16 {
   return a + b;
 }
 ```
 
 ```rust
-/// Void function with a return
-fn function(a: u16) void {
+/// Function which returns no value but still uses a return
+/// to stop early.
+fn function(a: u16) {
   if a < 5 { return; }
 
   // ...
@@ -48,7 +49,7 @@ fn function(a: u16) void {
 ```
 
 ## Executable Entry Points
-The starting point of a program happens in a special `entry` function. Entry functions are essentially void parameterless functions.
+The starting point of a program happens in a special `entry` function. Entry functions are essentially parameterless functions with no return.
 
 ```c
 entry {
@@ -63,7 +64,7 @@ Although Much Assembly Required runs the starting point of an application every 
 ## Calling Functions
 
 ```rust
-fn add(a: u16, b: u16) u16 {
+fn add(a: u16, b: u16) -> u16 {
   return a + b;
 }
 
@@ -86,7 +87,7 @@ For example:
 // For the given function 'add', this function can 
 // be invoked in two ways...
 
-fn add(a: u16, b: u16) u16 {
+fn add(a: u16, b: u16) -> u16 {
   return a + b;
 }
 

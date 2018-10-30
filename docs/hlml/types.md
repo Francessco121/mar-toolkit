@@ -14,6 +14,3 @@ HLML is a strongly-typed language.
 
 ### Boolean
 - `bool` - Represents either `true` or `false`.
-
-### Special
-- `void` - Specifies that a function returns nothing. Only allowed to appear as a function return type.

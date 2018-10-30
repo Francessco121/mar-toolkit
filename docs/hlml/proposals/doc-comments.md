@@ -8,7 +8,7 @@ Documentation comments in HLML start with three forward slashes and appear befor
 
 ```csharp
 /// A function that does nothing... :(
-fn pointless() void { }
+fn pointless() { }
 
 /// Valid on variables too!
 ///

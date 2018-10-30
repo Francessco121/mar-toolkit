@@ -6,7 +6,7 @@
 In HLML, variables as passed by value to functions (i.e. the value is copied into the parameter). 
 
 ```rust
-fn func(a: u16) void {
+fn func(a: u16) {
   // a equals 40 here
   
   a = 20;
@@ -26,7 +26,7 @@ entry {
 An exception to this rule is arrays and structs, neither of which are allowed to be passed by value:
 ```rust
 // Compile-time error!
-fn func(array: u16[3]) void { }
+fn func(array: u16[3]) { }
 ```
 
 ## "Pass-By Reference"

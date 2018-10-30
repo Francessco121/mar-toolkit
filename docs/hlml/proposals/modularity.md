@@ -9,7 +9,7 @@ HLML supports importing other HLML files through the use of the `import` keyword
 ```dart
 import "bar.hlml";
 
-fn function() void {
+fn function() {
   var number: u16 = getInteger();
 }
 ```
@@ -17,7 +17,7 @@ fn function() void {
 **bar.hlml:**
 ```rust
 // The 'pub' keyword exposes a top-level declaration to other files
-pub fn getInteger() u16 {
+pub fn getInteger() -> u16 {
   return 0x0123;
 }
 ```
@@ -46,7 +46,7 @@ export "a.hlml";
 ```dart
 import "b.hlml";
 
-fn function() void {
+fn function() {
   var value: u16 = SOME_CONSTANT; // value == 24
 }
 ```

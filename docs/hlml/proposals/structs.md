@@ -36,7 +36,7 @@ struct Point {
     this.y = y;
   }
 
-  public fn add(other: Point) Point {
+  public fn add(other: Point) -> Point {
     return new Point(
       x: x + other.x,
       y: y + other.y
@@ -133,7 +133,7 @@ struct Point {
   public this(x => this.x, y => this.y);
 }
 
-fn midpoint(a: &const Point, b: &const Point) Point {
+fn midpoint(a: &const Point, b: &const Point) -> Point {
   return new Point(
     x: (a.x + b.x) / 2,
     y: (a.y + b.y) / 2
@@ -142,7 +142,7 @@ fn midpoint(a: &const Point, b: &const Point) Point {
 
 entry {
   var p1: Point = new Point(5, 6);
-  var p2: Point = n ew Point(3, 12);
+  var p2: Point = new Point(3, 12);
 
   var mid: Point = midpoint(p1, p2);
 

@@ -19,7 +19,7 @@ let readonlyPointer: &const u16 = @intToPtr(0x0100);
 ## Using Pointers to "Pass-By Reference"
 ```rust
 /// Increments the given [valuePtr]'s value.
-fn increment(valuePtr: &u16) void {
+fn increment(valuePtr: &u16) {
   *valuePtr = *valuePtr + 1;
 }
 
