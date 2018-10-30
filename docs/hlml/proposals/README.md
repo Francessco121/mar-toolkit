@@ -2,7 +2,7 @@
 
 # HLML Language Proposals
 
-The following is a list of features that are planned to be added to HLML in the future along with the proposed design the feature.
+The following is a list of features that are planned to be added to HLML in the future along with the proposed design of the feature.
 
 ## Contents
 
