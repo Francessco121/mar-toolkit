@@ -1,0 +1,20 @@
+name: hlml_compiler
+author: Ethan Lafrenais
+
+publish_to: none
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+executables:
+  hlmlc:
+
+dependencies:
+  args: ^1.5.0
+  charcode: ^1.1.2
+  mar:
+    path: ../mar
+  meta: ^1.1.6
+  path: ^1.6.2
+  source_span: ^1.4.1
+  string_scanner: ^1.0.4

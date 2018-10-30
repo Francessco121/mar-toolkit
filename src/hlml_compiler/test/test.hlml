@@ -1,0 +1,7 @@
+fn getValue() -> u16 {
+  return 50;
+}
+
+entry {
+  let value: u16 = getValue();
+}

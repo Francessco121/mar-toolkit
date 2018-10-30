@@ -1,0 +1,58 @@
+enum TokenType {
+  // Symbols
+  colon,
+  semicolon,
+  comma,
+  dot,
+  leftBrace,
+  rightBrace,
+  leftParen,
+  rightParen,
+  plus,
+  minus,
+  percent,
+  forwardSlash,
+  star,
+  less,
+  lessLess,
+  lessEqual,
+  greater,
+  greaterGreater,
+  greaterEqual,
+  amp,
+  ampAmp,
+  pipe,
+  pipePipe,
+  equal,
+  equalEqual,
+  bang,
+  bangEqual,
+  caret,
+  tilde,
+  thinArrow,
+
+  // Literals
+  identifier,
+  integer,
+
+  // Keywords
+  $true,
+  $false,
+  $var,
+  let,
+  entry,
+  undefined,
+  fn,
+  $return,
+  $if,
+  $else,
+  loop,
+  $while,
+  $do,
+  $break,
+  $continue,
+  sleep,
+
+  // End-of-file
+  eof
+}
