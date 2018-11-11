@@ -1,5 +1,3 @@
-[[← back]](../)
-
 # MAR Toolkit Documentation
 
 ## Contents

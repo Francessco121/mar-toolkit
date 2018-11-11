@@ -1,4 +1,4 @@
-[[← back]](../README.md)
+[[← back]](../)
 
 # The Macro MAR Assembly Language Reference
 
