@@ -1,15 +1,15 @@
-# High Level MAR Language Toolkit
+# The MAR Toolkit
 
-The HLML toolkit is a set of programs meant for building bots for the game [Much Assembly Required](https://github.com/simon987/Much-Assembly-Required), primarily through the use of the High Level MAR Language.
+The MAR toolkit is a set of programs designed for building bots for the game [Much Assembly Required](https://github.com/simon987/Much-Assembly-Required).
 
-**Note:** This project is very much a work in progress and anything could change.
+> Note: This project is not officially part of the game.
 
-## Current Features
+## Features
 
 ### Macro MAR (MMAR) assembly language
 The Macro MAR language is designed to be a superset of Much Assembly Required's language. In addition to all the features of MAR, MMAR adds its own features such as macros, file modularity, and assemble-time math.
 
-- [Macro MAR language reference](./docs/mmar)
+- [Macro MAR Language Reference](./docs/mmar)
 - [Macro MAR Assembler](./src/mmar_assembler)
 
 ### MAR Disassembler
@@ -22,9 +22,6 @@ A 'floppy disk' manager is included in the toolkit to ease the process of readin
 
 - [MAR Floppy Manager](./src/mar_floppy_manager)
 
-## Future Goals
-- The HLML compiler
-
 ## Contents
-- [docs](./docs) - Contains the HLML language reference and the MMAR language reference.
+- [docs](./docs) - Contains the MMAR language reference and other information.
 - [src](./src) - Contains the toolkit's applications and libraries.

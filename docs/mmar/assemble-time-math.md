@@ -1,4 +1,4 @@
-[[← back]](./)
+[[← back]](./README.md)
 
 # Assemble-Time Math in MMAR
 

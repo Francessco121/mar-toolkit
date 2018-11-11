@@ -1,3 +1,0 @@
-entry {
-  let value: u16 = 3;
-}

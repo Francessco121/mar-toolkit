@@ -1,4 +1,0 @@
-enum LiteralType {
-  integer,
-  boolean
-}

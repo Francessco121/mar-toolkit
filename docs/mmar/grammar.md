@@ -1,4 +1,4 @@
-[[← back]](./)
+[[← back]](./README.md)
 
 # Macro MAR Assembly Grammar
 

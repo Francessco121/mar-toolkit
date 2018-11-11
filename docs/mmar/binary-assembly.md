@@ -1,4 +1,4 @@
-[[← back]](./)
+[[← back]](./README.md)
 
 # Binary Assembly in MMAR
 
